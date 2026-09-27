@@ -25,3 +25,16 @@ The application MUST show suggestions separately from learner text and MUST NOT 
 - GIVEN the provider returns a follow-up question
 - WHEN the learner advances to the next stage
 - THEN that follow-up is shown and the authored next prompt remains available as fallback
+
+### Requirement: Learner-controlled error log
+The application MUST let the learner explicitly save an observed/preferred expression pair for spaced review and MUST group repeated pairs locally with an occurrence count.
+
+#### Scenario: Accept correction
+- GIVEN feedback with an observed and preferred form
+- WHEN the learner chooses to add the correction to review
+- THEN the pair is stored locally and scheduled for retrieval
+
+#### Scenario: Repeated correction
+- GIVEN a saved expression pair
+- WHEN the same pair is accepted again with case or punctuation differences
+- THEN the existing entry's occurrence count increases and its next review is scheduled for one day later

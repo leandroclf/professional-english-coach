@@ -6,7 +6,7 @@ The browser sends one response to the same-origin local Node server only after t
 
 ## Feedback contract
 
-Strict JSON schema returns: comprehension-critical concern, one priority language correction, natural professional rewrite, reusable expression, and a follow-up question. Empty critical/accuracy strings mean none identified. Follow-up questions replace the next authored prompt for that session only. Responses are suggestions, not assessed grades. JSON is validated before rendering; all values are HTML escaped.
+Strict JSON schema returns: comprehension-critical concern, one priority language correction, an observed/preferred form pair, natural professional rewrite, reusable expression, and a follow-up question. Empty critical, accuracy and correction-pair fields mean none identified. Follow-up questions replace the next authored prompt for that session only. The learner can accept a correction into the review deck; repeated identical pairs are grouped and rescheduled locally. Responses are suggestions, not assessed grades. JSON is validated before rendering; all values are HTML escaped.
 
 ## Limits and safety
 

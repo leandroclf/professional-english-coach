@@ -10,7 +10,7 @@ The product has a four-axis self-reflection form, but it has no validated outcom
 
 ## 2. Adaptive feedback
 
-See `openspec/changes/add-ai-feedback/`. Opt-in OpenAI Responses API feedback, a strict schema, unverified-suggestion labels and adaptive follow-up are implemented. Gate: human-rated quality and safety sample, browser acceptance and latency/cost budget. An accept/reject workflow is still needed before adding generated expressions to the review deck.
+See `openspec/changes/add-ai-feedback/`. Opt-in OpenAI Responses API feedback, a strict schema, unverified-suggestion labels, adaptive follow-up and learner-approved error-pattern capture are implemented. Gate: human-rated quality and safety sample, browser acceptance, latency/cost budget and correction validation.
 
 ## 3. Voice and presentation
 

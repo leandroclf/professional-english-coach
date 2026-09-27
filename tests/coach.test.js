@@ -2,12 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildFeedbackInput, parseFeedback, requestFeedback } from '../src/coach.js';
 
-const valid = { critical: '', accuracy: 'Use “depends on”.', natural_version: 'The design depends on the provider.', reusable_expression: 'It depends on…', follow_up: 'What happens if the provider is unavailable?' };
+const valid = { critical: '', accuracy: 'Use “depends on”.', observed_form: 'depends of', preferred_form: 'depends on', natural_version: 'The design depends on the provider.', reusable_expression: 'It depends on…', follow_up: 'What happens if the provider is unavailable?' };
 
 test('feedback parser accepts the required coaching structure and bounds text', () => {
   assert.deepEqual(parseFeedback(JSON.stringify(valid)), valid);
   assert.throws(() => parseFeedback('{broken'), /valid JSON/);
   assert.throws(() => parseFeedback(JSON.stringify({ accuracy: 'Only one field' })), /missing critical/);
+  assert.throws(() => parseFeedback(JSON.stringify({ ...valid, observed_form: '' })), /both observed and preferred/);
   const long = { ...valid, accuracy: 'x'.repeat(2000) };
   assert.equal(parseFeedback(JSON.stringify(long)).accuracy.length, 1800);
 });

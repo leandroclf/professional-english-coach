@@ -24,6 +24,7 @@ The local Node server keeps provider credentials out of the browser. To enable o
 - Conversation, technical leadership and presentation tracks, each with sequential prompts and reflection.
 - Unfinished session recovery, completed session history and manual review of responses.
 - Manually captured expressions with reveal-first retrieval practice and 1/3/7/14/30-day scheduling.
+- Learner-approved correction pairs, grouped into a local error log with repeat counts.
 - Optional browser dictation with an editable transcript and text-to-speech prompt playback where the browser supports it.
 - Per-response consent-based AI feedback via the OpenAI Responses API, with a strict structured response and a server-side key.
 - Learner self-reflection ratings for fluency, precision, professional vocabulary and argumentation.

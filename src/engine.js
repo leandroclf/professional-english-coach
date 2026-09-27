@@ -47,7 +47,10 @@ export function addReview(state, item, now = new Date()) {
   if (!original || !improved) throw new Error('Both expressions are required.');
   const due = new Date(now);
   due.setUTCDate(due.getUTCDate() + intervals[0]);
-  return { ...state, reviews: [{ id: crypto.randomUUID(), original, improved, context: item.context.trim(), step: 0, dueAt: due.toISOString(), createdAt: now.toISOString() }, ...state.reviews] };
+  const normalize = value => value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const match = state.reviews.find(review => normalize(review.original) === normalize(original) && normalize(review.improved) === normalize(improved));
+  if (match) return { ...state, reviews: state.reviews.map(review => review.id === match.id ? { ...review, occurrences: (review.occurrences ?? 1) + 1, step: 0, dueAt: due.toISOString(), lastSeenAt: now.toISOString(), context: item.context.trim() || review.context } : review) };
+  return { ...state, reviews: [{ id: crypto.randomUUID(), original, improved, context: item.context.trim(), occurrences: 1, step: 0, dueAt: due.toISOString(), createdAt: now.toISOString() }, ...state.reviews] };
 }
 
 export function reviewItem(state, id, recalled, now = new Date()) {

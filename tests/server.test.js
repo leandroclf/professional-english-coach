@@ -28,7 +28,7 @@ test('feedback endpoint does not call provider when keys are missing', async () 
 });
 
 test('feedback endpoint returns structured provider suggestions without logging the response', async () => {
-  const expected = { critical: '', accuracy: '', natural_version: 'That design improves recovery.', reusable_expression: 'The trade-off is…', follow_up: 'How will you measure recovery time?' };
+  const expected = { critical: '', accuracy: '', observed_form: '', preferred_form: '', natural_version: 'That design improves recovery.', reusable_expression: 'The trade-off is…', follow_up: 'How will you measure recovery time?' };
   let providerRequest;
   await withServer({ apiKey: 'server-secret', model: 'coach-model', fetchImpl: async (url, options) => {
     providerRequest = { url, options };

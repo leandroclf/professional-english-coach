@@ -36,6 +36,18 @@ test('review recall advances spacing and a retry resets it', () => {
   assert.equal(state.reviews[0].dueAt, '2026-10-02T12:00:00.000Z');
 });
 
+test('repeated corrections are grouped and scheduled for another retrieval attempt', () => {
+  const first = new Date('2026-09-27T12:00:00Z');
+  let state = addReview(initialState(), { original: 'depends of', improved: 'depends on', context: 'Provider review' }, first);
+  const id = state.reviews[0].id;
+  state = addReview(state, { original: 'Depends of!', improved: 'depends on', context: 'Architecture review' }, new Date('2026-09-28T12:00:00Z'));
+  assert.equal(state.reviews.length, 1);
+  assert.equal(state.reviews[0].id, id);
+  assert.equal(state.reviews[0].occurrences, 2);
+  assert.equal(state.reviews[0].context, 'Architecture review');
+  assert.equal(state.reviews[0].dueAt, '2026-09-29T12:00:00.000Z');
+});
+
 test('local state round trip and invalid version handling', () => {
   const memory = new Map();
   const storage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value) };

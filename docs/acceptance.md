@@ -2,7 +2,7 @@
 
 ## Automated checks completed
 
-- `npm run check`: 12 tests pass, including session persistence, adaptive prompts, retrieval scheduling, AI response parsing, provider failure handling, HTTP status behavior and hidden-file blocking.
+- `npm run check`: 13 tests pass, including session persistence, adaptive prompts, duplicate error-pattern grouping, retrieval scheduling, AI response parsing, provider failure handling, HTTP status behavior and hidden-file blocking.
 - Local server smoke check: `/` returns `200`, `/api/status` reports feedback unavailable when credentials are absent, and `/.env.example` returns `403`.
 - OpenSpec CLI strict validation: all 3 active changes pass (`add-ai-feedback`, `add-voice-practice`, `establish-text-practice-mvp`); OpenSpec Doctor reports a valid root.
 - OpenSpec status: planning artifacts are complete for all 3 changes. Each still has manual acceptance or research quality tasks open, listed below.
