@@ -53,7 +53,7 @@ function practice() {
     const track = tracks.find(t => t.id === state.active.trackId);
     if (!track) return `<div class="panel"><h2>Unknown track</h2><button data-action="discard">Discard session</button></div>`;
     const stage = track.stages[state.active.index];
-    const lastFeedback = state.active.answers.slice().reverse().find(answer => answer.feedback)?.feedback;
+    const lastFeedback = state.active.index > 0 ? state.active.answers[state.active.index - 1]?.feedback : null;
     const stagePrompt = stage && state.active.index > 0 ? state.active.answers[state.active.index - 1]?.feedback?.follow_up || stage.prompt : stage?.prompt;
     return `${header('Practice room', 'Respond in English before seeing the next challenge.')}
       <div class="practice-layout"><div class="panel practice-panel"><div class="progress-top"><span class="eyebrow">${escapeHtml(track.name.toUpperCase())}</span><span>STEP ${Math.min(state.active.index + 1, track.stages.length)} OF ${track.stages.length}</span></div>

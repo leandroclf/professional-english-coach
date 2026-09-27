@@ -47,6 +47,7 @@ The project follows [OpenSpec](https://openspec.dev/docs/setup): `openspec/confi
 | `tests/` | Session, review and persistence behavior |
 | `docs/research.md` | Research rationale and limits |
 | `docs/roadmap.md` | Prioritized implementation stages and release gates |
+| `docs/acceptance.md` | Completed automated checks and remaining manual acceptance |
 | `openspec/changes/` | Current and proposed behavior changes |
 
 ## Privacy and limitations

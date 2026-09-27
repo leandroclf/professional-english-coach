@@ -14,7 +14,7 @@ The application MUST offer dictation when the browser supports speech recognitio
 - THEN the transcript remains editable and the learner can correct it before sending
 
 ### Requirement: Prompt playback
-The application SHOULD read the current prompt aloud when browser speech synthesis is available.
+The application MUST offer to read the current prompt aloud when browser speech synthesis is available.
 
 #### Scenario: Adaptive prompt playback
 - GIVEN the prior answer produced an AI follow-up
