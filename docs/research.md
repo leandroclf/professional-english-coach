@@ -2,6 +2,30 @@
 
 This is a research-informed product rationale, not evidence that this application improves proficiency. Evidence from other learners and settings must be tested for the intended user and task.
 
+## Method review and product decision (September 2026)
+
+The implementation review compared public learning-method descriptions from Duolingo and Busuu with peer-reviewed second-language acquisition research. Company pages describe their own product choices; they are useful for competitor patterns, not independent evidence that a feature causes learning.
+
+| Finding | Practical reading | Decision for this project |
+|---|---|---|
+| A review of adult L2 vocabulary training finds stronger rationale for spaced retrieval and learner-generated semantic elaboration than for massed repetition alone. | Recall and meaningful use complement exposure; the evidence concerns vocabulary training, not technical meeting performance. | Keep the local review deck and existing intervals as product hypotheses. Add a brief learner-generated sentence after recognition, grounded in the track's real work context. |
+| A 2022 meta-analysis of 48 experiments (N=3,411) reports a medium-to-large overall effect of spacing in second-language learning. Longer spacing outperformed shorter spacing on delayed tests, while equal and expanding schedules were statistically equivalent; effects varied with learning target, sessions, practice type, feedback timing and retention interval. | Spacing is supported in general, but one fixed interval sequence is not established as optimal for this learner or type of language. | Do not claim the current 1/3/7/14/30-day intervals are optimal; preserve manual recall ratings and record this as a future evaluation question. |
+| Retrieval practice outperformed imitation in a controlled foreign-vocabulary study. | Showing a phrase again and asking for it from memory are meaningfully different practice actions. | Retain recall-before-reveal and encourage personally generated language rather than adding repeat-after-me drills. |
+| A 2026 Bayesian meta-analysis of 52 controlled studies found robust evidence for durable, moderate effectiveness of written corrective feedback; the authors still note that guidance on which feedback works best is limited, and found similar aggregate effects across direct, indirect and metalinguistic types. | Feedback can help written L2 accuracy in studied settings, but that does not validate unverified generative suggestions or any specific AI feedback format here. | Keep AI feedback optional, unverified and consent-based. Do not automate correctness decisions for free responses. Validate the learner's preferred revision before storing a correction. |
+| A 2026 meta-analysis of dialogue-based CALL (16 studies, 89 effects) found a moderate pooled effect on L2 speaking development, with effects moderated by system type, meaning constraints and modality. Recent task-repetition reviews likewise examine specific writing or speaking outcomes. | There is promise for dialogue systems and repeated output in the studied conditions; neither result establishes transfer to this text-based app or to live spoken professional English. | Keep the current AI exchange explicitly text-based; reserve human conversation and any spoken-fluency claims for separate design and evaluation. |
+
+### Competitor pattern review
+
+- Duolingo's public teaching-method description combines a sequenced learning path, brief mixed exercises, immediate response feedback and practice that adapts to prior errors. The transferable product pattern is clear sequencing and fast feedback; its gamification, breadth of data and automated adaptation are outside this single-learner MVP.
+- Busuu publicly emphasizes compact topic-focused lessons, controlled and freer phrase reproduction, community corrections, study plans and review of mistakes. The relevant pattern is a progression from focused activity to meaningful production, plus a route from automated practice toward human feedback. Its community features require moderation, identity, notifications and user-content handling that this local-only app does not have.
+- Both products offer broader language coverage and practice modes than this project. This project differentiates through specific backend engineering and technical leadership scenarios, not through a claim of pedagogical superiority.
+
+### Implemented progression and limits
+
+For new sessions, the sequence is now (1) true/false recognition, (2) multiple-choice recognition, (3) a track-specific one-sentence production frame, and (4) the existing open professional scenarios. The frame requests a personal decision and reason rather than an answer to copy. This is a low-risk design hypothesis drawn from the broader evidence on retrieval, generation and scaffolded practice; no cited study tests this exact sequence in advanced technical English. Existing open prompts and the consent-based optional AI text turn remain after it. The separate expression deck continues to ask for recall before revealing a saved phrase.
+
+The next evidence gate is not adding a proficiency score. It is observing completion and learner usability, then comparing repeated writing samples on comparable technical tasks with independent human ratings. Spoken claims require spoken tasks and calibrated human raters. Without that evaluation, the interface must remain an ungraded practice tool.
+
 | Design choice | Evidence and interpretation | Limit |
 |---|---|---|
 | Workplace scenarios and interaction | The CEFR Companion Volume includes descriptors for interaction, mediation and phonological control. Dialogue-based computer-assisted language-learning research reports speaking-development benefits across studies. We model architecture review, disagreement and presentation as meaningful tasks. | The first release is text-only and scripted, so evidence about dialogue and oral skill cannot be directly transferred to this experience. |
@@ -19,6 +43,13 @@ This is a research-informed product rationale, not evidence that this applicatio
 6. [Optimizing distributed practice online](https://www.cambridge.org/core/journals/studies-in-second-language-acquisition/article/optimizing-distributed-practice-online/C833408A4C3BAD939CA39EA734423BB7), *Studies in Second Language Acquisition*.
 7. OpenAI, [Developer quickstart](https://platform.openai.com/docs/quickstart/make-your-first-api-request), documenting the server-side Responses API pattern. The coach integration uses a structured response and keeps the API key on the local server.
 8. MDN, [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) and [SpeechRecognition compatibility notes](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition), documenting the separate synthesis/recognition interfaces and limited browser availability of recognition.
+9. Kim, Y. (2022), [The Effects of Spaced Practice on Second Language Learning: A Meta-Analysis](https://doi.org/10.1111/lang.12479), *Language Learning*.
+10. Nakata, T. (2013), [Don't just repeat after me: Retrieval practice is better than imitation for foreign vocabulary learning](https://pubmed.ncbi.nlm.nih.gov/23681928/), *Psychonomic Bulletin & Review*.
+11. Brown, D., Liu, Q. & Norouzian, R. (2026), [Effectiveness of written corrective feedback in developing L2 accuracy: A Bayesian meta-analysis](https://doi.org/10.1177/13621688221147374), *Language Teaching Research*.
+12. Hou, Z. & Min, S. (2026), [Dialogue-based computer-assisted language learning systems for second language speaking development: A three-level meta-analysis](https://doi.org/10.1017/S0958344025100268), *ReCALL*.
+13. Tabari, M. A. et al. (2025), [Task repetition and L2 written performance: A meta-analysis](https://doi.org/10.1016/j.jslw.2025.101255), *Journal of Second Language Writing*.
+14. Duolingo, [The Duolingo Method](https://blog.duolingo.com/duolingo-teaching-method/) and [Spaced Repetition](https://blog.duolingo.com/spaced-repetition-for-learning/), first-party product explanations.
+15. Busuu, [Methodology](https://www.busuu.com/en/it-works/busuu-methodology), [community corrections](https://www.busuu.com/en/how-to/corrections), and [Mistake Repair](https://help.busuu.com/hc/en-us/articles/30418575225106-What-is-Mistake-Repair-and-how-can-it-help-me-learn-a-language), first-party product explanations.
 
 ## Validation plan
 

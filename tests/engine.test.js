@@ -15,10 +15,10 @@ test('a session preserves staged answers and completed history', () => {
   assert.deepEqual(state.sessions[0].selfRatings, { fluency: 3, argumentation: 4 });
 });
 
-test('every track starts with true-false and multiple-choice checks before open responses', () => {
+test('every track progresses from recognition through guided production to open responses', () => {
   for (const track of tracks) {
-    assert.deepEqual(track.stages.slice(0, 2).map(stage => stage.mode), ['true_false', 'multiple_choice']);
-    assert.equal(track.stages[2].mode, undefined);
+    assert.deepEqual(track.stages.slice(0, 3).map(stage => stage.mode), ['true_false', 'multiple_choice', 'guided_response']);
+    assert.equal(track.stages[3].mode, undefined);
     let state = startSession(initialState(), track);
     state = submitAnswer(state, track, 'False');
     assert.equal(state.active.answers[0].evaluation.correct, true);
@@ -26,8 +26,12 @@ test('every track starts with true-false and multiple-choice checks before open 
     assert.equal(state.active.answers[1].text, 'The queue maybe good.');
     assert.equal(state.active.answers[1].evaluation.correct, false);
     assert.equal(state.active.answers[1].evaluation.correctAnswer, 'The main trade-off is added latency in exchange for better isolation.');
-    state = submitAnswer(state, track, 'I would explain the trade-off with a concrete example.');
+    state = submitAnswer(state, track, 'I chose asynchronous processing because it improves recovery.');
     assert.equal(state.active.answers[2].evaluation, undefined);
+    assert.equal(state.active.answers[2].stage, 'Guided sentence · one idea');
+    assert.match(state.active.answers[2].prompt, /Complete this frame/);
+    state = submitAnswer(state, track, 'I would explain the trade-off with a concrete example.');
+    assert.equal(state.active.answers[3].evaluation, undefined);
   }
 });
 

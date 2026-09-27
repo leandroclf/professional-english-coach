@@ -26,8 +26,8 @@ The private Sites deployment serves the static practice app over HTTPS. Practice
 ## Current experience
 
 - Conversation, technical leadership and presentation tracks, each with sequential prompts and reflection.
-- Gradual practice in each track: true/false, multiple choice, then open-ended professional responses.
-- Immediate explanations for the two guided exercises; these are practice checks, not a proficiency score.
+- Gradual practice in each track: true/false, multiple choice, a one-sentence guided response, then open-ended professional responses.
+- Immediate explanations for the two recognition checks; the guided sentence is ungraded and all activities are practice, not a proficiency score.
 - Optional text exchange with the AI coach after the authored exercises, when the configured local service is available and the learner opts in.
 - Unfinished session recovery, completed session history and manual review of responses.
 - Manually captured expressions with reveal-first retrieval practice and 1/3/7/14/30-day scheduling.

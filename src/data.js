@@ -54,9 +54,28 @@ const foundations = [
   }
 ];
 
+const guidedFrames = {
+  conversation: {
+    prompt: 'Complete this frame with a real recent decision: “I chose ___ because ___.”',
+    hint: 'Write one specific sentence. State the choice and the reason from your own experience.'
+  },
+  leadership: {
+    prompt: 'Complete this frame for a real design discussion: “I see the concern. I would recommend ___ because ___.”',
+    hint: 'Keep the tone constructive. Add one reason that connects to the team’s goal.'
+  },
+  presentation: {
+    prompt: 'Complete this frame for a real technical decision: “I recommend ___ because the evidence shows ___.”',
+    hint: 'Name a concrete decision and the evidence you would use to support it.'
+  }
+};
+
 for (const track of tracks) {
   track.legacyStages = track.stages;
-  track.stages = [...foundations.map(stage => ({ ...stage, options: stage.options.map(option => ({ ...option })) })), ...track.legacyStages];
+  const copiedFoundations = foundations.map(stage => ({ ...stage, options: stage.options.map(option => ({ ...option })) }));
+  track.stages = [...copiedFoundations, {
+    label: 'Guided sentence · one idea', mode: 'guided_response', minutes: 2,
+    ...guidedFrames[track.id], placeholder: 'Write one sentence in your own words…'
+  }, ...track.legacyStages];
 }
 
 export const expressions = [

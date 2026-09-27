@@ -2,7 +2,7 @@
 
 ## Automated checks completed
 
-- `npm run check`: 20 tests pass, including progressive exercise order and evaluation, legacy-session continuity, AI follow-up conversation, session persistence, response-draft recovery, interface localization, review scheduling, provider handling and HTTP behavior.
+- `npm run check`: 20 tests pass, including the true/false → multiple-choice → guided sentence → open response progression, legacy-session continuity, ungraded learner-generated output, AI follow-up conversation, session persistence, response-draft recovery, Portuguese localization, review scheduling, provider handling and HTTP behavior.
 - `npm run build`: static output is generated successfully; a build scan confirms no Google Fonts references remain.
 - Local server smoke check: `/` returns `200`, `/api/status` reports feedback unavailable when credentials are absent, and `/.env.example` returns `403`.
 - OpenSpec CLI strict validation previously passed for the 3 pre-existing changes (`add-ai-feedback`, `add-voice-practice`, `establish-text-practice-mvp`); OpenSpec Doctor reported a valid root.
@@ -19,7 +19,7 @@
 ## Manual acceptance checklist
 
 1. Configure `OPENAI_API_KEY` and a supported `OPENAI_MODEL` in a local `.env`; start with `npm run dev`.
-2. Complete each track, confirm the true/false and multiple-choice checks appear before open responses, and reload during an unfinished session to confirm answers and the original stage order remain.
+2. Complete each track, confirm the true/false and multiple-choice checks, then the one-sentence frame and open responses; reload during an unfinished session to confirm answers and the original stage order remain.
 3. Open with a Portuguese browser locale, switch to English and back, reload, and confirm the choice persists while practice prompts remain in English.
 4. After all authored prompts, opt in to the AI exchange; confirm its follow-up becomes one final conversation turn. Submit without opting in and confirm the session moves to reflection and the response remains local.
 5. Test speech recognition in the target desktop and mobile browsers, including denial of microphone permission and recognition failure. Confirm typed input still works and the transcript is editable.

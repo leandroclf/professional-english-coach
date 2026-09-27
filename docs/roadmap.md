@@ -2,7 +2,7 @@
 
 ## 0. Foundation — implemented, browser acceptance pending
 
-Text scenarios, progressive true/false and multiple-choice warm-ups, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
+Text scenarios, progressive true/false and multiple-choice practice, a short guided sentence, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. This sequence is research-informed but has not been evaluated for learning outcomes in this product. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
 
 ## 1. Research and measurement
 
