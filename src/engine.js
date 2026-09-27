@@ -20,7 +20,7 @@ export function saveState(storage, state) {
 
 export function startSession(state, track, now = new Date()) {
   if (state.active) throw new Error('Finish or discard the current session first.');
-  return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0 } };
+  return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0, draft: '' } };
 }
 
 export function submitAnswer(state, track, answer, feedback = null, prompt = null) {
@@ -31,8 +31,14 @@ export function submitAnswer(state, track, answer, feedback = null, prompt = nul
   return { ...state, active: {
     ...state.active,
     answers: [...state.active.answers, { stage: track.stages[state.active.index].label, prompt: prompt || track.stages[state.active.index].prompt, text, ...(feedback ? { feedback } : {}) }],
-    index: state.active.index + 1
+    index: state.active.index + 1,
+    draft: ''
   } };
+}
+
+export function saveDraft(state, draft) {
+  if (!state.active) return state;
+  return { ...state, active: { ...state.active, draft: String(draft ?? '') } };
 }
 
 export function finishSession(state, reflection, selfRatings = {}, now = new Date()) {

@@ -20,4 +20,4 @@ See `openspec/changes/add-voice-practice/`. Browser dictation into an editable r
 
 Learner model, goals, scenario authoring, cross-device storage and progress reports. Gate: privacy and account model, migration from local export, measured retention and evidence that adaptive scheduling helps compared with the baseline.
 
-Prioritize the next step using observed use, not the number of features. The local app has no cloud hosting or user account; optional AI calls incur provider API charges.
+Prioritize the next step using observed use, not the number of features. The Sites-hosted build is static and private. It keeps learner data and language preferences in local browser storage and does not include the local Node server's optional AI feedback endpoint. The application has no user account or cross-device sync. If provider-backed feedback is added to hosting later, it needs an explicit API-cost budget and the existing per-response consent.

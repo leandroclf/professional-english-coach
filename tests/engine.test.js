@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { tracks } from '../src/data.js';
-import { initialState, startSession, submitAnswer, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
+import { initialState, startSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
 
 test('a session preserves staged answers and completed history', () => {
   const track = tracks[2];
@@ -57,4 +57,17 @@ test('local state round trip and invalid version handling', () => {
   assert.equal(loadState(storage).active.answers[0].text, 'I chose a queue for resilience.');
   storage.setItem(STORAGE_KEY, '{"version": 999}');
   assert.deepEqual(loadState(storage), initialState());
+});
+
+test('an unfinished response draft survives reload and clears after submission', () => {
+  const memory = new Map();
+  const storage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value) };
+  let state = startSession(initialState(), tracks[0]);
+  state = saveDraft(state, 'I would isolate the provider behind a port.');
+  saveState(storage, state);
+  state = loadState(storage);
+  assert.equal(state.active.draft, 'I would isolate the provider behind a port.');
+  state = submitAnswer(state, tracks[0], state.active.draft);
+  assert.equal(state.active.draft, '');
+  assert.equal(state.active.answers[0].text, 'I would isolate the provider behind a port.');
 });

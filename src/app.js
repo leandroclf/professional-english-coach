@@ -1,24 +1,41 @@
 import { tracks, expressions } from './data.js';
-import { STORAGE_KEY, loadState, saveState, startSession, submitAnswer, finishSession, addReview, reviewItem, dueReviews, exportData, initialState } from './engine.js';
+import { STORAGE_KEY, loadState, saveState, startSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, exportData, initialState } from './engine.js';
+import { LANGUAGE_KEY, LANGUAGES, preferredLanguage, practiceCopy, trackCopy, translateMarkup, translateText } from './i18n.js';
 
 const root = document.querySelector('#app');
 let state = loadState(localStorage);
+let language;
+try { language = preferredLanguage(localStorage.getItem(LANGUAGE_KEY), navigator.language); }
+catch { language = preferredLanguage('', navigator.language); }
 let view = 'overview';
 let revealedReview = null;
 let notice = '';
 let feedbackAvailable = false;
+let feedbackStatus = 'checking';
 let recognition = null;
+let dynamicValues = [];
 
-const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-const dateLabel = value => new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(value));
+const escapeHtml = value => {
+  const html = String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  const marker = `__COACH_DYNAMIC_${dynamicValues.length}__`;
+  dynamicValues.push(html);
+  return marker;
+};
+const dateLabel = value => new Intl.DateTimeFormat(language === 'pt-BR' ? 'pt-BR' : 'en', { day: 'numeric', month: 'short' }).format(new Date(value));
+const displayTrack = (track, field) => trackCopy(track, language)[field];
+const feedbackUnavailableMessage = () => translateText(feedbackStatus === 'checking'
+  ? 'AI feedback availability is being checked. Your answer stays on this device.'
+  : feedbackStatus === 'unsupported'
+    ? 'AI feedback is not included in this hosted version. Your answer stays on this device.'
+    : 'AI feedback is not configured on this server. Your answer stays on this device.', language);
 const ratingLabels = { fluency: 'Fluency', precision: 'Precision', vocabulary: 'Professional vocabulary', argumentation: 'Argumentation' };
 const ratingFields = () => Object.entries(ratingLabels).map(([key, label]) => `<label for="rating-${key}">${label} <span class="muted">(1 = needs work, 5 = felt strong)</span></label><select id="rating-${key}" name="rating-${key}"><option value="">Not rated</option>${[1,2,3,4,5].map(value => `<option value="${value}">${value}</option>`).join('')}</select>`).join('');
 const feedbackCard = (feedback, context = '') => `<div class="feedback-box"><span class="eyebrow">COACH SUGGESTION · REVIEW BEFORE REUSE</span>${feedback.critical ? `<p><strong>Clarity:</strong> ${escapeHtml(feedback.critical)}</p>` : ''}${feedback.accuracy ? `<p><strong>Language:</strong> ${escapeHtml(feedback.accuracy)}</p>` : ''}${feedback.observed_form && feedback.preferred_form ? `<p><strong>Pattern:</strong> ${escapeHtml(feedback.observed_form)} → ${escapeHtml(feedback.preferred_form)}</p><button class="button subtle" data-action="save-correction" data-original="${escapeHtml(feedback.observed_form)}" data-improved="${escapeHtml(feedback.preferred_form)}" data-context="${escapeHtml(context)}">Add this correction to review ↗</button>` : ''}<p><strong>Natural version:</strong> ${escapeHtml(feedback.natural_version)}</p><p><strong>Reusable expression:</strong> ${escapeHtml(feedback.reusable_expression)}</p><p><strong>Follow-up:</strong> ${escapeHtml(feedback.follow_up)}</p></div>`;
 
 function update(next) { state = next; saveState(localStorage, state); render(); }
-function setNotice(message) { notice = message; render(); }
+function setNotice(message) { notice = translateText(message, language); render(); }
 function navigation() {
-  return `<aside class="sidebar"><a class="brand" href="#overview"><span class="brand-mark">P<span>↗</span></span><span>PROFESSIONAL<br><strong>ENGLISH COACH</strong></span></a>
+  return `<aside class="sidebar"><a class="skip-link" href="#main-content">Skip to main content</a><a class="brand" href="#overview"><span class="brand-mark">P<span>↗</span></span><span>PROFESSIONAL<br><strong>ENGLISH COACH</strong></span></a>
     <div class="side-label">YOUR WORKSPACE</div>
     <nav aria-label="Main navigation">
       <a href="#overview" class="nav-link ${view === 'overview' ? 'active' : ''}">◫ <span>Overview</span></a>
@@ -31,7 +48,9 @@ function navigation() {
 }
 
 function header(title, subtitle) {
-  return `<div class="page-top"><div><p class="eyebrow">THE WORKSPACE / ${escapeHtml(view.toUpperCase())}</p><h1>${title}</h1><p class="subtext">${subtitle}</p></div><div class="top-actions"><span class="status-dot"></span> Learning in progress</div></div>`;
+  const viewName = language === 'pt-BR' ? ({ overview: 'VISÃO GERAL', practice: 'PRÁTICA', reviews: 'REVISÕES', history: 'HISTÓRICO' })[view] : view.toUpperCase();
+  const status = state.active ? 'Practice in progress' : 'Ready to practice';
+  return `<div class="page-top"><div><p class="eyebrow">THE WORKSPACE / ${escapeHtml(viewName)}</p><h1>${title}</h1><p class="subtext">${subtitle}</p></div><div class="header-controls"><div class="language-switch" role="group" aria-label="Interface language"><button type="button" data-language="en" aria-pressed="${language === 'en'}">EN</button><button type="button" data-language="pt-BR" aria-pressed="${language === 'pt-BR'}">PT-BR</button></div><div class="top-actions"><span class="status-dot"></span> ${status}</div></div></div>`;
 }
 
 function overview() {
@@ -44,8 +63,8 @@ function overview() {
     <div class="stats"><div class="stat"><span>COMPLETED SESSIONS</span><strong>${completed.toString().padStart(2, '0')}</strong><small>Keep showing up</small></div><div class="stat"><span>EXPRESSIONS TO REVIEW</span><strong>${due.toString().padStart(2, '0')}</strong><small>${due ? 'Ready for retrieval' : 'All caught up'}</small></div><div class="stat"><span>LAST PRACTICED</span><strong class="date-stat">${completed ? dateLabel(state.sessions[0].completedAt) : '—'}</strong><small>${completed ? tracks.find(t => t.id === state.sessions[0].trackId)?.name ?? 'Practice' : 'Your journey starts here'}</small></div></div>
     ${completed && state.sessions[0].selfRatings && Object.keys(state.sessions[0].selfRatings).length ? `<div class="panel ratings-panel"><div><span class="eyebrow">LATEST SELF-ASSESSMENT</span><p class="muted">Reflection aid, not a proficiency score.</p></div><div class="rating-summary">${Object.entries(ratingLabels).map(([key, label]) => `<div><span>${label}</span><strong>${escapeHtml(state.sessions[0].selfRatings[key] ?? '—')}<small> / 5</small></strong></div>`).join('')}</div></div>` : ''}
     <div class="section-title track-heading"><div><span class="eyebrow">THE WEEKLY RHYTHM</span><h2>Three ways to grow</h2></div><a href="#practice" class="text-link">Explore practice →</a></div>
-    <div class="track-grid">${tracks.map(t => `<a href="#practice" class="track-card"><span class="track-number">${t.number} / ${t.day}</span><div class="track-symbol">${t.id === 'conversation' ? '◌' : t.id === 'leadership' ? '◇' : '▧'}</div><h3>${escapeHtml(t.name)}</h3><p>${escapeHtml(t.intro)}</p><span class="track-foot">${t.minutes} MINUTES <span>↗</span></span></a>`).join('')}</div>
-    <p class="footnote">Practice is text based in this first release. Scores and language corrections are not generated automatically.</p>`;
+    <div class="track-grid">${tracks.map(t => `<a href="#practice" class="track-card"><span class="track-number">${t.number} / ${escapeHtml(displayTrack(t, 'day'))}</span><div class="track-symbol">${t.id === 'conversation' ? '◌' : t.id === 'leadership' ? '◇' : '▧'}</div><h3>${escapeHtml(displayTrack(t, 'name'))}</h3><p>${escapeHtml(displayTrack(t, 'intro'))}</p><span class="track-foot">${t.minutes} MINUTES <span>↗</span></span></a>`).join('')}</div>
+    <p class="footnote">Your practice is not graded. AI suggestions require an enabled server and your consent.</p>`;
 }
 
 function practice() {
@@ -57,17 +76,17 @@ function practice() {
     const lastFeedback = lastAnswer?.feedback;
     const stagePrompt = stage && state.active.index > 0 ? state.active.answers[state.active.index - 1]?.feedback?.follow_up || stage.prompt : stage?.prompt;
     return `${header('Practice room', 'Respond in English before seeing the next challenge.')}
-      <div class="practice-layout"><div class="panel practice-panel"><div class="progress-top"><span class="eyebrow">${escapeHtml(track.name.toUpperCase())}</span><span>STEP ${Math.min(state.active.index + 1, track.stages.length)} OF ${track.stages.length}</span></div>
+      <div class="practice-layout"><div class="panel practice-panel"><div class="progress-top"><span class="eyebrow">${escapeHtml(displayTrack(track, 'name').toUpperCase())}</span><span>STEP ${Math.min(state.active.index + 1, track.stages.length)} OF ${track.stages.length}</span></div>
       <div class="progress-bar"><span style="width:${Math.round(state.active.index / track.stages.length * 100)}%"></span></div>
-      ${stage ? `<span class="stage-label">${escapeHtml(stage.label)} · ABOUT ${stage.minutes} MIN</span><h2>${escapeHtml(stagePrompt)}</h2><p class="muted">${escapeHtml(stage.hint)}</p>${lastFeedback ? feedbackCard(lastFeedback, lastAnswer.prompt) : ''}
-      <form id="answer-form"><input type="hidden" name="prompt" value="${escapeHtml(stagePrompt)}"><label for="answer">Your response</label><textarea id="answer" name="answer" required rows="8" placeholder="Write what you would say in the meeting…"></textarea><div class="voice-tools"><p class="voice-disclosure">Speech recognition may use a browser-managed service. This app stores only the transcript; review it before sending.</p><button type="button" class="button subtle" data-action="dictate">🎙 ${recognition ? 'Stop dictation' : 'Dictate in English'}</button><button type="button" class="button subtle" data-action="read-prompt">▶ Read prompt aloud</button><span id="voice-status" role="status">Voice support depends on your browser.</span></div>
-      <label class="consent-row"><input type="checkbox" name="ai-consent" ${feedbackAvailable ? '' : 'disabled'}><span><strong>Get optional AI feedback</strong><small>${feedbackAvailable ? 'This sends the current prompt, your response and up to 3 recent responses to the configured AI provider. Suggestions are unverified; review before using them.' : 'AI feedback is unavailable until the server is configured. Your answer stays on this device.'}</small></span></label>
+      ${stage ? `<span class="stage-label">${escapeHtml(practiceCopy(stage.label, language))} · ABOUT ${stage.minutes} MIN</span><h2>${escapeHtml(stagePrompt)}</h2><p class="muted">${escapeHtml(practiceCopy(stage.hint, language))}</p>${lastFeedback ? feedbackCard(lastFeedback, lastAnswer.prompt) : ''}
+      <form id="answer-form"><input type="hidden" name="prompt" value="${escapeHtml(stagePrompt)}"><label for="answer">Your response</label><textarea id="answer" name="answer" required rows="8" placeholder="Write what you would say in the meeting…">${escapeHtml(state.active.draft ?? '')}</textarea><div class="voice-tools"><p class="voice-disclosure">Speech recognition may use a browser-managed service. This app stores only the transcript; review it before sending.</p><button type="button" class="button subtle" data-action="dictate">🎙 ${recognition ? 'Stop dictation' : 'Dictate in English'}</button><button type="button" class="button subtle" data-action="read-prompt">▶ Read prompt aloud</button><span id="voice-status" role="status">Voice support depends on your browser.</span></div>
+      <label class="consent-row"><input type="checkbox" name="ai-consent" ${feedbackAvailable ? '' : 'disabled'}><span><strong>Get optional AI feedback</strong><small>${feedbackAvailable ? 'This sends the current prompt, your response and up to 3 recent responses to the configured AI provider. Suggestions are unverified; review before using them.' : escapeHtml(feedbackUnavailableMessage())}</small></span></label>
       <div class="form-actions"><button class="button primary" type="submit">Save & continue →</button><button type="button" class="button subtle" data-action="discard">Discard session</button></div></form>
       ` : `<span class="stage-label">REFLECTION</span><h2>What will you say differently next time?</h2><p class="muted">Review your answers, then write one practical takeaway. Your self-assessment is yours; this version does not grade your English.</p><form id="finish-form"><label for="reflection">Your takeaway (optional)</label><textarea id="reflection" name="reflection" rows="4" placeholder="One thing I want to improve is…"></textarea><div class="rating-fields">${ratingFields()}</div><button class="button primary" type="submit">Complete session →</button></form>`}</div>
-      <aside class="panel context-panel"><span class="eyebrow">YOUR SESSION</span><h3>${escapeHtml(track.name)}</h3><p>${escapeHtml(track.intro)}</p><div class="context-divider"></div><span class="eyebrow">RESPONSES</span>${state.active.answers.length ? state.active.answers.map(a => `<details><summary>${escapeHtml(a.stage)}</summary><p>${escapeHtml(a.text)}</p></details>`).join('') : '<p class="muted">Your responses will appear here as you go.</p>'}</aside></div>`;
+      <aside class="panel context-panel"><span class="eyebrow">YOUR SESSION</span><h3>${escapeHtml(displayTrack(track, 'name'))}</h3><p>${escapeHtml(displayTrack(track, 'intro'))}</p><div class="context-divider"></div><span class="eyebrow">RESPONSES</span>${state.active.answers.length ? state.active.answers.map(a => `<details><summary>${escapeHtml(a.stage)}</summary><p>${escapeHtml(a.text)}</p></details>`).join('') : '<p class="muted">Your responses will appear here as you go.</p>'}</aside></div>`;
   }
   return `${header('Choose your practice.', 'Three focused formats for technical communication in English.')}
-  <div class="selection-grid">${tracks.map(t => `<article class="panel selection-card"><span class="eyebrow">${t.day} · ${t.minutes} MINUTES</span><div class="big-symbol">${t.number}</div><h2>${escapeHtml(t.name)}</h2><p>${escapeHtml(t.intro)}</p><p class="muted">${t.stages.length} prompts · write at your own pace</p><button data-action="start" data-track="${t.id}" class="button primary">Begin session ↗</button></article>`).join('')}</div><p class="footnote">The suggested time is a guide. There is no automatic timer or live conversation partner in this version.</p>`;
+  <div class="selection-grid">${tracks.map(t => `<article class="panel selection-card"><span class="eyebrow">${escapeHtml(displayTrack(t, 'day'))} · ${t.minutes} MINUTES</span><div class="big-symbol">${t.number}</div><h2>${escapeHtml(displayTrack(t, 'name'))}</h2><p>${escapeHtml(displayTrack(t, 'intro'))}</p><p class="muted">${t.stages.length} prompts · write at your own pace</p><button data-action="start" data-track="${t.id}" class="button primary">Begin session ↗</button></article>`).join('')}</div><p class="footnote">The suggested time is a guide. There is no automatic timer or live conversation partner in this version.</p>`;
 }
 
 function reviews() {
@@ -81,12 +100,16 @@ function reviews() {
 function history() {
   return `${header('Your history', 'A record of the arguments you practiced and the ideas you sharpened.')}
     <div class="panel history-panel"><div class="history-head"><div><span class="eyebrow">YOUR RECORD</span><h2>${state.sessions.length} completed ${state.sessions.length === 1 ? 'session' : 'sessions'}</h2></div><div class="form-actions"><button class="button subtle" data-action="export">Export data</button><button class="button danger" data-action="clear">Delete all data</button></div></div>
-    ${state.sessions.length ? state.sessions.map(s => `<details class="history-item"><summary><span><strong>${escapeHtml(tracks.find(t => t.id === s.trackId)?.name ?? s.trackId)}</strong><small>${dateLabel(s.completedAt)} · ${s.answers.length} responses</small></span><span>View session +</span></summary>${s.answers.map(a => `<div class="history-answer"><small>${escapeHtml(a.stage)} · ${escapeHtml(a.prompt)}</small><p>${escapeHtml(a.text)}</p>${a.feedback ? feedbackCard(a.feedback, a.prompt) : ''}</div>`).join('')}<div class="history-answer">${s.selfRatings && Object.keys(s.selfRatings).length ? `<small>SELF-REFLECTION RATINGS · NOT A PROFICIENCY SCORE</small><p>${Object.entries(ratingLabels).filter(([key]) => s.selfRatings[key]).map(([key,label]) => `${escapeHtml(label)}: ${escapeHtml(s.selfRatings[key])}/5`).join(" · ")}</p>` : ""}</div><div class="history-answer"><small>REFLECTION</small><p>${escapeHtml(s.reflection || 'No reflection recorded.')}</p></div></details>`).join('') : '<p class="empty-note">Your completed sessions will appear here. Start with one focused practice.</p>'}</div>`;
+    ${state.sessions.length ? state.sessions.map(s => `<details class="history-item"><summary><span><strong>${escapeHtml(displayTrack(tracks.find(t => t.id === s.trackId) ?? { id: s.trackId, name: s.trackId, intro: '', day: '' }, 'name'))}</strong><small>${dateLabel(s.completedAt)} · ${s.answers.length} responses</small></span><span>View session +</span></summary>${s.answers.map(a => `<div class="history-answer"><small>${escapeHtml(practiceCopy(a.stage, language))} · ${escapeHtml(a.prompt)}</small><p>${escapeHtml(a.text)}</p>${a.feedback ? feedbackCard(a.feedback, a.prompt) : ''}</div>`).join('')}<div class="history-answer">${s.selfRatings && Object.keys(s.selfRatings).length ? `<small>SELF-REFLECTION RATINGS · NOT A PROFICIENCY SCORE</small><p>${Object.entries(ratingLabels).filter(([key]) => s.selfRatings[key]).map(([key,label]) => `${escapeHtml(label)}: ${escapeHtml(s.selfRatings[key])}/5`).join(" · ")}</p>` : ""}</div><div class="history-answer"><small>REFLECTION</small><p>${escapeHtml(s.reflection || translateText('No reflection recorded.', language))}</p></div></details>`).join('') : '<p class="empty-note">Your completed sessions will appear here. Start with one focused practice.</p>'}</div>`;
 }
 
 function render() {
   view = ['overview', 'practice', 'reviews', 'history'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'overview';
-  root.innerHTML = `${navigation()}<main class="main"><div class="content">${notice ? `<div class="notice" role="status">${escapeHtml(notice)} <button data-action="dismiss" aria-label="Dismiss notification">×</button></div>` : ''}${({ overview, practice, reviews, history })[view]()}</div><footer>PROFESSIONAL ENGLISH COACH <span>THINK CLEARLY. SPEAK CONFIDENTLY.</span></footer></main>`;
+  dynamicValues = [];
+  const markup = `${navigation()}<main id="main-content" class="main" tabindex="-1"><div class="content">${notice ? `<div class="notice" role="status">${escapeHtml(notice)} <button data-action="dismiss" aria-label="Dismiss notification">×</button></div>` : ''}${({ overview, practice, reviews, history })[view]()}</div><footer>PROFESSIONAL ENGLISH COACH <span>THINK CLEARLY. SPEAK CONFIDENTLY.</span></footer></main>`;
+  root.innerHTML = translateMarkup(markup, language).replace(/__COACH_DYNAMIC_(\d+)__/g, (_, index) => dynamicValues[Number(index)] ?? '');
+  document.documentElement.lang = language;
+  document.title = language === 'pt-BR' ? 'Professional English Coach — Prática de inglês profissional' : 'Professional English Coach';
 }
 
 root.addEventListener('submit', async event => {
@@ -100,12 +123,12 @@ root.addEventListener('submit', async event => {
       const prompt = data.get('prompt');
       let feedback = null;
       if (data.get('ai-consent') === 'on') {
-        const button = event.target.querySelector('[type="submit"]'); button.disabled = true; button.textContent = 'Coach is reviewing…';
+        const button = event.target.querySelector('[type="submit"]'); button.disabled = true; button.textContent = language === 'pt-BR' ? 'O coach está analisando…' : 'Coach is reviewing…';
         try {
           const response = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ track: track.name, prompt, answer, previousAnswers: active.answers }) });
           const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Coach feedback is unavailable.');
           feedback = result;
-        } catch (error) { notice = `${error.message} Your response will still be saved.`; }
+        } catch (error) { notice = translateText(`${error.message} Your response will still be saved.`, language); }
       }
       if (state.active?.id !== active.id) return;
       update(submitAnswer(state, track, answer, feedback, prompt));
@@ -119,29 +142,37 @@ root.addEventListener('submit', async event => {
 });
 
 root.addEventListener('click', event => {
-  const button = event.target.closest('[data-action]');
+  const button = event.target.closest('[data-action], [data-language]');
   if (!button) return;
+  if (button.dataset.language) {
+    if (LANGUAGES.includes(button.dataset.language)) {
+      language = button.dataset.language;
+      try { localStorage.setItem(LANGUAGE_KEY, language); } catch { /* Language still changes for this page view. */ }
+      render();
+    }
+    return;
+  }
   const { action, track, id } = button.dataset;
   if (action === 'dismiss') { notice = ''; render(); }
   if (action === 'read-prompt') {
     if (!('speechSynthesis' in window)) return setNotice('Read aloud is not supported in this browser.');
     const active = state.active; const track = active && tracks.find(t => t.id === active.trackId); const nextPrompt = track?.stages[active.index];
     const prompt = active?.index > 0 ? active.answers[active.index - 1]?.feedback?.follow_up || nextPrompt?.prompt : nextPrompt?.prompt;
-    speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(prompt));
+    speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(prompt); utterance.lang = 'en-US'; speechSynthesis.speak(utterance);
   }
   if (action === 'dictate') {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return setNotice('Speech recognition is not supported here. You can still type your response.');
-    if (recognition) { recognition.stop(); recognition = null; button.textContent = '🎙 Dictate in English'; return; }
+    if (recognition) { recognition.stop(); recognition = null; button.textContent = `🎙 ${language === 'pt-BR' ? 'Ditado em inglês' : 'Dictate in English'}`; return; }
     recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.continuous = true; recognition.interimResults = false;
     const textarea = root.querySelector('#answer'); const status = root.querySelector('#voice-status');
     recognition.onresult = event => { const words = Array.from(event.results).slice(event.resultIndex).map(result => result[0].transcript.trim()).join(' '); textarea.value = `${textarea.value}${textarea.value && words ? ' ' : ''}${words}`; textarea.dispatchEvent(new Event('input', { bubbles: true })); };
-    recognition.onerror = () => { recognition = null; if (status) status.textContent = 'Microphone recognition failed. You can continue by typing.'; button.textContent = '🎙 Dictate in English'; };
-    recognition.onend = () => { recognition = null; const current = root.querySelector('[data-action="dictate"]'); if (current) current.textContent = '🎙 Dictate in English'; if (status) status.textContent = 'Dictation stopped. Review and edit your transcript.'; };
-    recognition.start(); button.textContent = '■ Stop dictation'; if (status) status.textContent = 'Listening. Review the transcript before submitting.';
+    recognition.onerror = () => { recognition = null; if (status) status.textContent = language === 'pt-BR' ? 'Falha no reconhecimento pelo microfone. Você pode continuar digitando.' : 'Microphone recognition failed. You can continue by typing.'; button.textContent = `🎙 ${language === 'pt-BR' ? 'Ditado em inglês' : 'Dictate in English'}`; };
+    recognition.onend = () => { recognition = null; const current = root.querySelector('[data-action="dictate"]'); if (current) current.textContent = `🎙 ${language === 'pt-BR' ? 'Ditado em inglês' : 'Dictate in English'}`; if (status) status.textContent = language === 'pt-BR' ? 'Ditado encerrado. Revise e edite a transcrição.' : 'Dictation stopped. Review and edit your transcript.'; };
+    recognition.start(); button.textContent = `■ ${language === 'pt-BR' ? 'Parar ditado' : 'Stop dictation'}`; if (status) status.textContent = language === 'pt-BR' ? 'Ouvindo. Revise a transcrição antes de enviar.' : 'Listening. Review the transcript before submitting.';
   }
   if (action === 'start') { update(startSession(state, tracks.find(t => t.id === track))); location.hash = '#practice'; }
-  if (action === 'discard' && confirm('Discard this unfinished session?')) update({ ...state, active: null });
+  if (action === 'discard' && confirm(language === 'pt-BR' ? 'Descartar esta sessão inacabada?' : 'Discard this unfinished session?')) update({ ...state, active: null });
   if (action === 'reveal') { revealedReview = id; render(); }
   if (action === 'review-recalled' || action === 'review-retry') { update(reviewItem(state, id, action === 'review-recalled')); revealedReview = null; }
   if (action === 'save-correction') {
@@ -149,11 +180,26 @@ root.addEventListener('click', event => {
     const entry = next.reviews.find(item => item.original.toLowerCase() === button.dataset.original.toLowerCase() && item.improved.toLowerCase() === button.dataset.improved.toLowerCase());
     update(next); setNotice(entry?.occurrences > 1 ? `Saved. This pattern has been recorded ${entry.occurrences} times.` : 'Correction added to your review deck.');
   }
-  if (action === 'remove-review' && confirm('Remove this expression?')) update({ ...state, reviews: state.reviews.filter(item => item.id !== id) });
+  if (action === 'remove-review' && confirm(language === 'pt-BR' ? 'Remover esta expressão?' : 'Remove this expression?')) update({ ...state, reviews: state.reviews.filter(item => item.id !== id) });
   if (action === 'export') { const blob = new Blob([exportData(state)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'professional-english-coach-data.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
-  if (action === 'clear' && confirm('Delete all local sessions, reviews and unfinished work? This cannot be undone.')) { localStorage.removeItem(STORAGE_KEY); state = initialState(); render(); }
+  if (action === 'clear' && confirm(language === 'pt-BR' ? 'Apagar sessões, revisões e atividades inacabadas deste dispositivo? Esta ação não pode ser desfeita.' : 'Delete all local sessions, reviews and unfinished work? This cannot be undone.')) { localStorage.removeItem(STORAGE_KEY); state = initialState(); render(); }
 });
 
 addEventListener('hashchange', render);
+root.addEventListener('input', event => {
+  if (event.target.id !== 'answer' || !state.active) return;
+  state = saveDraft(state, event.target.value);
+  try { saveState(localStorage, state); } catch { /* Keep the current response in the editor if storage is unavailable. */ }
+});
 render();
-fetch('/api/status').then(response => response.json()).then(result => { feedbackAvailable = Boolean(result.feedbackAvailable); if (view === 'practice' && state.active) render(); }).catch(() => {});
+fetch('/api/status').then(response => {
+  if (!response.ok) throw new Error('Status endpoint unavailable.');
+  return response.json();
+}).then(result => {
+  feedbackAvailable = Boolean(result.feedbackAvailable);
+  feedbackStatus = feedbackAvailable ? 'available' : 'unconfigured';
+  if (view === 'practice' && state.active) render();
+}).catch(() => {
+  feedbackStatus = 'unsupported';
+  if (view === 'practice' && state.active) render();
+});

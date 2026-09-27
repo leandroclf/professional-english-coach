@@ -15,13 +15,13 @@ npm run dev
 npm run check
 ```
 
-The web app uses browser-native JavaScript modules and stores learner data in your browser's `localStorage`. There is no account or external persistence. A local server provides the optional feedback endpoint; no automated language assessment or scoring is included. The optional Google Fonts CSS request can be removed for a fully offline presentation; fallback system fonts are configured.
+The web app uses browser-native JavaScript modules and stores learner data in your browser's `localStorage`. The interface is available in English and Brazilian Portuguese; practice prompts, learner responses and coaching suggestions remain in English. The language choice and unfinished response draft are also stored locally. There is no account or external learner-data persistence. The interface uses system fonts and makes no web-font request.
 
 The local Node server keeps provider credentials out of the browser. To enable optional AI feedback, copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `OPENAI_MODEL` to a supported model in your OpenAI API account. API use is billed separately from a ChatGPT subscription. After the learner opts in for a response, the app sends its prompt, response and up to three recent responses to the configured provider. The `.env` file is ignored by Git. The server binds to `127.0.0.1` by default and does not log learner text. Never commit credentials.
 
 ## Hosted version
 
-The Sites deployment serves the static practice app over HTTPS. Practice sessions, history and review items remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so AI feedback is unavailable there.
+The private Sites deployment serves the static practice app over HTTPS. Practice sessions, history, review items, interface language and unfinished response drafts remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so the hosted interface reports AI feedback as unavailable.
 
 ## Current experience
 
@@ -33,12 +33,14 @@ The Sites deployment serves the static practice app over HTTPS. Practice session
 - Per-response consent-based AI feedback via the OpenAI Responses API, with a strict structured response and a server-side key.
 - Learner self-reflection ratings for fluency, precision, professional vocabulary and argumentation.
 - JSON export and confirmed deletion of all local data.
+- English and Brazilian Portuguese interface localization, independent from English practice content.
+- Local recovery of an unfinished response draft after a page reload.
 
 This release supports spoken dictation and listening, but it does **not** assess pronunciation, oral fluency, CEFR level or learning outcomes. Speech recognition is browser dependent and may use a browser-managed service; this app stores only the transcript. Always review it before submission. AI feedback is a suggestion, not a verified correction. When enabled, its follow-up question becomes the next prompt; otherwise the authored challenge is used. The self-ratings are reflective notes, not proficiency scores. Validate corrections before adding them to the review deck.
 
 ## Specification-driven workflow
 
-The project follows [OpenSpec](https://openspec.dev/docs/setup): `openspec/config.yaml` holds context; `openspec/changes/establish-text-practice-mvp/` contains proposal, design, testable delta specs and task list. The first change stays active pending browser acceptance checks. Future changes for AI feedback and voice practice have separate proposals. When a change passes acceptance, verify it, sync its requirements into `openspec/specs/`, then archive it. Avoid describing a proposal as shipped functionality.
+The project follows [OpenSpec](https://openspec.dev/docs/setup): `openspec/config.yaml` holds context; `openspec/changes/` contains the proposals, designs, testable delta specs and task lists for the practice MVP, AI feedback, voice practice, and English/PT-BR localization with draft recovery. Some changes remain active pending manual browser or human-rated evaluation. When a change passes its acceptance gates, verify it, sync its requirements into `openspec/specs/`, then archive it. Avoid describing a proposal as shipped functionality.
 
 ## Project map
 
@@ -47,8 +49,10 @@ The project follows [OpenSpec](https://openspec.dev/docs/setup): `openspec/confi
 | `src/data.js` | Practice scenarios and reusable expressions |
 | `src/engine.js` | Pure state transitions and review scheduling |
 | `src/app.js` | Browser UI and actions |
+| `src/i18n.js` | Interface language selection and localized copy |
 | `src/coach.js` | Response schema, input shaping and provider request |
 | `server.js` | Local-only static server and optional feedback endpoint |
+| `scripts/build-static.mjs` | Static asset build for Sites hosting |
 | `tests/` | Session, review and persistence behavior |
 | `docs/research.md` | Research rationale and limits |
 | `docs/roadmap.md` | Prioritized implementation stages and release gates |
