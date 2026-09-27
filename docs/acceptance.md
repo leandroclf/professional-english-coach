@@ -28,3 +28,13 @@ These can be performed during personal use and do not block this release: test o
 - Eight original MP3s and one MP4/VTT pair are generated and packaged. FFprobe reports a nine-second video, 59,636 bytes. Build checks require every referenced asset and transcript.
 - Research source verification corrected two prior author attributions. Competitor claims are first-party feature descriptions, not independent effectiveness evidence.
 - Remaining service-dependent and platform work is proposed in `expand-family-learning-platform`; no claim that all conceivable features are implemented.
+
+## Published delivery — version 8
+
+- GitHub implementation commit: `b08a2636c2777581062bb9f190205e9dd7e3a21b`.
+- [GitHub Actions run](https://github.com/leandroclf/professional-english-coach/actions/runs/36346694842): completed, success.
+- Site source commit: `9fb96c0dda5e32e75a3deb23ca54c5d9aba3b9d9`; static archive contains 26 files.
+- Sites version 8 deployment: succeeded on 2026-09-27 at 20:05 UTC.
+- Live URL: https://professional-english-coach.leandroclf.chatgpt.site
+- Implemented OpenSpec change archived as `2026-09-27-add-evidence-informed-learning`. The family-platform proposal remains open and unimplemented.
+- Source changes after deployment are documentation-only delivery records; deployed application code is unchanged.
