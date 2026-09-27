@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 1618)
+Total output lines: 71
+
 # Professional English Coach
 
 ![CI](https://github.com/leandroclf/professional-english-coach/actions/workflows/ci.yml/badge.svg)
@@ -21,29 +24,7 @@ The local Node server keeps provider credentials out of the browser. To enable o
 
 ## Hosted version
 
-The private Sites deployment serves the static practice app over HTTPS. Practice sessions, history, review items, interface language and unfinished response drafts remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so the hosted interface reports AI feedback as unavailable.
-
-## Current experience
-
-- Conversation, technical leadership and presentation tracks, each with sequential prompts and reflection.
-- Gradual practice in each track: true/false, multiple choice, a one-sentence guided response, then open-ended professional responses.
-- Immediate explanations for the two recognition checks; the guided sentence is ungraded and all activities are practice, not a proficiency score.
-- Optional text exchange with the AI coach after the authored exercises, when the configured local service is available and the learner opts in.
-- Unfinished session recovery, completed session history and manual review of responses.
-- Manually captured expressions with reveal-first retrieval practice and 1/3/7/14/30-day scheduling.
-- Learner-approved correction pairs, grouped into a local error log with repeat counts.
-- Optional browser dictation with an editable transcript and text-to-speech prompt playback where the browser supports it.
-- Per-response consent-based AI feedback via the OpenAI Responses API, with a strict structured response and a server-side key.
-- Learner self-reflection ratings for fluency, precision, professional vocabulary and argumentation.
-- JSON export and confirmed deletion of all local data.
-- English and Brazilian Portuguese interface localization, independent from English practice content.
-- Local recovery of an unfinished response draft after a page reload.
-
-This release supports spoken dictation and listening, but it does **not** assess pronunciation, oral fluency, CEFR level or learning outcomes. Speech recognition is browser dependent and may use a browser-managed service; this app stores only the transcript. Always review it before submission. AI feedback is a suggestion, not a verified correction. After all authored exercises, an enabled local server can provide a text response and one follow-up exchange with separate consent at each submission; this is not a continuous conversation. Otherwise, the session moves to reflection. The self-ratings are reflective notes, not proficiency scores. Validate corrections before adding them to the review deck. Human-led conversation practice is a possible future stage and is not available in this release.
-
-## Specification-driven workflow
-
-The project follows [OpenSpec](https://openspec.dev/docs/setup): `openspec/config.yaml` holds context; `openspec/changes/` contains the proposals, designs, testable delta specs and task lists for the practice MVP, progressive exercises, AI feedback, voice practice, and English/PT-BR localization with draft recovery. Some changes remain active pending manual browser or human-rated evaluation. When a change passes its acceptance gates, verify it, sync its requirements into `openspec/specs/`, then archive it. Avoid describing a proposal as shipped functionality.
+The Sites deployment serves the static practice app over HTTPS. Practice sessions, history, review items, interface language and unfinished response drafts remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so the hosted interface reports AI fee…618 tokens truncated…for the practice MVP, progressive exercises, AI feedback, voice practice, and English/PT-BR localization with draft recovery. Some changes remain active pending manual browser or human-rated evaluation. When a change passes its acceptance gates, verify it, sync its requirements into `openspec/specs/`, then archive it. Avoid describing a proposal as shipped functionality.
 
 ## Project map
 
