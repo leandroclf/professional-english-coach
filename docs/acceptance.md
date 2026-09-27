@@ -10,7 +10,7 @@
 
 ## Known limits accepted for this personal/family release
 
-- The 4.36-second mono MP3 (26,463 bytes, 22.05 kHz) was generated locally with FFmpeg/libflite. Owner authorization enables use and public hosting. Pronunciation and voice/output rights were not independently reviewed; authorization is not legal clearance.
+- The 4.36-second mono MP3 (26,463 bytes, 22.05 kHz) was generated locally with FFmpeg/libflite and is included in the current static Site build. Owner authorization enables use and public hosting. Pronunciation and voice/output rights were not independently reviewed; authorization is not legal clearance.
 - No manual browser, keyboard, screen reader or mobile acceptance was performed. The owner asked to remove manual checks as release gates; the app uses native browser media controls, includes a transcript, and lets learners skip the activity.
 - No video clip was authored. The Colab notebook is optional.
 - No `OPENAI_API_KEY` or `OPENAI_MODEL` was available. AI behavior was exercised with a mock Responses API, not a billable live request. Generated coaching remains opt-in and unverified.
