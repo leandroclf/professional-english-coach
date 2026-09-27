@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Explicit consent for provider processing
-The application MUST send a learner response to the configured AI provider only after the learner explicitly opts in for that response. Provider credentials MUST remain on the server.
+The application MUST send the current prompt, learner response and up to three recent responses to the configured AI provider only after the learner explicitly opts in for that response. Provider credentials MUST remain on the server.
 
 #### Scenario: Consent unchecked
 - GIVEN AI feedback is configured

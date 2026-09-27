@@ -17,7 +17,7 @@ npm run check
 
 The web app uses browser-native JavaScript modules and stores learner data in your browser's `localStorage`. There is no account or external persistence. A local server provides the optional feedback endpoint; no automated language assessment or scoring is included. The optional Google Fonts CSS request can be removed for a fully offline presentation; fallback system fonts are configured.
 
-The local Node server keeps provider credentials out of the browser. To enable optional AI feedback, copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `OPENAI_MODEL` to a supported model in your OpenAI API account. API use is billed separately from a ChatGPT subscription. The app sends a response to the configured provider only after the learner opts in on that response. The `.env` file is ignored by Git. The server binds to `127.0.0.1` by default and does not log learner text. Never commit credentials.
+The local Node server keeps provider credentials out of the browser. To enable optional AI feedback, copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `OPENAI_MODEL` to a supported model in your OpenAI API account. API use is billed separately from a ChatGPT subscription. After the learner opts in for a response, the app sends its prompt, response and up to three recent responses to the configured provider. The `.env` file is ignored by Git. The server binds to `127.0.0.1` by default and does not log learner text. Never commit credentials.
 
 ## Current experience
 
@@ -30,7 +30,7 @@ The local Node server keeps provider credentials out of the browser. To enable o
 - Learner self-reflection ratings for fluency, precision, professional vocabulary and argumentation.
 - JSON export and confirmed deletion of all local data.
 
-This release supports spoken dictation and listening, but it does **not** assess pronunciation, oral fluency, CEFR level or learning outcomes. Speech recognition is browser dependent; always review the transcript. AI feedback is a suggestion, not a verified correction. When enabled, its follow-up question becomes the next prompt; otherwise the authored challenge is used. The self-ratings are reflective notes, not proficiency scores. Validate corrections before adding them to the review deck.
+This release supports spoken dictation and listening, but it does **not** assess pronunciation, oral fluency, CEFR level or learning outcomes. Speech recognition is browser dependent and may use a browser-managed service; this app stores only the transcript. Always review it before submission. AI feedback is a suggestion, not a verified correction. When enabled, its follow-up question becomes the next prompt; otherwise the authored challenge is used. The self-ratings are reflective notes, not proficiency scores. Validate corrections before adding them to the review deck.
 
 ## Specification-driven workflow
 

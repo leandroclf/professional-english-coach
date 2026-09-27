@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Optional speech input
-The application MUST offer dictation when the browser supports speech recognition, insert recognized text into an editable response, and retain typed input as a fallback.
+The application MUST offer dictation when the browser supports speech recognition, disclose that audio processing may use a browser-managed service before recording, insert recognized text into an editable response, and retain typed input as a fallback.
 
 #### Scenario: Recognition unavailable
 - GIVEN a browser without SpeechRecognition

@@ -2,7 +2,7 @@
 
 ## Request path
 
-The browser sends one response to the same-origin local Node server only after the learner checks the per-response consent box. The server calls the OpenAI Responses API using `OPENAI_API_KEY` and `OPENAI_MODEL` from its process environment. The browser never receives the key. No content is logged or persisted by the server; the structured suggestion is saved with that session in local browser storage.
+The browser sends the current prompt, response and up to three recent responses to the same-origin local Node server only after the learner checks the per-response consent box. The server calls the OpenAI Responses API using `OPENAI_API_KEY` and `OPENAI_MODEL` from its process environment. The browser never receives the key. No content is logged or persisted by the server; the structured suggestion is saved with that session in local browser storage.
 
 ## Feedback contract
 
