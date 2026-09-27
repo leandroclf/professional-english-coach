@@ -2,7 +2,7 @@
 
 ## 0. Foundation — implemented, browser acceptance pending
 
-Text scenarios, local history, manual expression review, export/delete and unit tests. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
+Text scenarios, progressive true/false and multiple-choice warm-ups, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
 
 ## 1. Research and measurement
 
@@ -21,3 +21,7 @@ See `openspec/changes/add-voice-practice/`. Browser dictation into an editable r
 Learner model, goals, scenario authoring, cross-device storage and progress reports. Gate: privacy and account model, migration from local export, measured retention and evidence that adaptive scheduling helps compared with the baseline.
 
 Prioritize the next step using observed use, not the number of features. The Sites-hosted build is static and private. It keeps learner data and language preferences in local browser storage and does not include the local Node server's optional AI feedback endpoint. The application has no user account or cross-device sync. If provider-backed feedback is added to hosting later, it needs an explicit API-cost budget and the existing per-response consent.
+
+## 5. Human conversation practice — future discovery
+
+Explore human-led sessions only after validating the guided-to-open-to-AI text progression. Define tutor identity and vetting, scheduling, safeguarding, learner-content handling, consent, moderation, accessibility and operating costs before building any matching or live conversation features. No human tutor feature is present today.

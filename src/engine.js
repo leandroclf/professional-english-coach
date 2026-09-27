@@ -18,22 +18,38 @@ export function saveState(storage, state) {
   storage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+export function stagesForSession(active, track) {
+  return active.stagePlan ?? track.legacyStages ?? track.stages;
+}
+
 export function startSession(state, track, now = new Date()) {
   if (state.active) throw new Error('Finish or discard the current session first.');
-  return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0, draft: '' } };
+  const stagePlan = track.stages.map(stage => ({ ...stage, ...(stage.options ? { options: stage.options.map(option => ({ ...option })) } : {}) }));
+  return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0, draft: '', stagePlan } };
 }
 
 export function submitAnswer(state, track, answer, feedback = null, prompt = null) {
   if (!state.active || state.active.trackId !== track.id) throw new Error('No matching active session.');
   const text = answer.trim();
   if (!text) throw new Error('Write a response before continuing.');
-  if (state.active.index >= track.stages.length) throw new Error('Session is already complete.');
-  return { ...state, active: {
+  const stages = stagesForSession(state.active, track);
+  const isAiConversation = state.active.index === stages.length && Boolean(state.active.conversationPrompt);
+  if (state.active.index >= stages.length && !isAiConversation) throw new Error('Session is already complete.');
+  const stage = stages[state.active.index] ?? { label: 'AI conversation', prompt: state.active.conversationPrompt };
+  const recordedText = stage.options?.find(option => option.value === text)?.label ?? text;
+  const evaluation = stage.correctAnswer ? {
+    correct: text === stage.correctAnswer,
+    correctAnswer: stage.options.find(option => option.value === stage.correctAnswer)?.label ?? stage.correctAnswer,
+    explanation: stage.explanation
+  } : null;
+  const active = {
     ...state.active,
-    answers: [...state.active.answers, { stage: track.stages[state.active.index].label, prompt: prompt || track.stages[state.active.index].prompt, text, ...(feedback ? { feedback } : {}) }],
+    answers: [...state.active.answers, { stage: stage.label, prompt: prompt || stage.prompt, text: recordedText, ...(evaluation ? { evaluation } : {}), ...(feedback ? { feedback } : {}) }],
     index: state.active.index + 1,
     draft: ''
-  } };
+  };
+  if (!isAiConversation && state.active.index === stages.length - 1 && feedback?.follow_up) active.conversationPrompt = feedback.follow_up;
+  return { ...state, active };
 }
 
 export function saveDraft(state, draft) {
@@ -43,7 +59,8 @@ export function saveDraft(state, draft) {
 
 export function finishSession(state, reflection, selfRatings = {}, now = new Date()) {
   if (!state.active) throw new Error('No active session.');
-  const session = { ...state.active, reflection: reflection.trim(), selfRatings, completedAt: now.toISOString() };
+  const { stagePlan, ...sessionData } = state.active;
+  const session = { ...sessionData, reflection: reflection.trim(), selfRatings, completedAt: now.toISOString() };
   return { ...state, active: null, sessions: [session, ...state.sessions] };
 }
 

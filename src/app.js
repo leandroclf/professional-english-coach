@@ -1,5 +1,5 @@
 import { tracks, expressions } from './data.js';
-import { STORAGE_KEY, loadState, saveState, startSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, exportData, initialState } from './engine.js';
+import { STORAGE_KEY, loadState, saveState, startSession, stagesForSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, exportData, initialState } from './engine.js';
 import { LANGUAGE_KEY, LANGUAGES, preferredLanguage, practiceCopy, trackCopy, translateMarkup, translateText } from './i18n.js';
 
 const root = document.querySelector('#app');
@@ -71,18 +71,22 @@ function practice() {
   if (state.active) {
     const track = tracks.find(t => t.id === state.active.trackId);
     if (!track) return `<div class="panel"><h2>Unknown track</h2><button data-action="discard">Discard session</button></div>`;
-    const stage = track.stages[state.active.index];
+    const stages = stagesForSession(state.active, track);
+    const isAiConversation = state.active.index === stages.length && Boolean(state.active.conversationPrompt);
+    const stage = stages[state.active.index] ?? (isAiConversation ? { label: 'AI conversation', mode: 'ai_conversation', minutes: 3, hint: language === 'pt-BR' ? 'Responda à pergunta do coach e, se quiser, receba uma última resposta.' : 'Reply to the coach’s question and, if you want, get one final response.' } : null);
+    const stageCount = stages.length + (state.active.conversationPrompt ? 1 : 0);
+    const canUseAi = feedbackAvailable && (state.active.index === stages.length - 1 || isAiConversation);
     const lastAnswer = state.active.index > 0 ? state.active.answers[state.active.index - 1] : null;
     const lastFeedback = lastAnswer?.feedback;
-    const stagePrompt = stage && state.active.index > 0 ? state.active.answers[state.active.index - 1]?.feedback?.follow_up || stage.prompt : stage?.prompt;
+    const stagePrompt = isAiConversation ? state.active.conversationPrompt : stage && state.active.index > 0 ? state.active.answers[state.active.index - 1]?.feedback?.follow_up || stage.prompt : stage?.prompt;
     return `${header('Practice room', 'Respond in English before seeing the next challenge.')}
-      <div class="practice-layout"><div class="panel practice-panel"><div class="progress-top"><span class="eyebrow">${escapeHtml(displayTrack(track, 'name').toUpperCase())}</span><span>STEP ${Math.min(state.active.index + 1, track.stages.length)} OF ${track.stages.length}</span></div>
-      <div class="progress-bar"><span style="width:${Math.round(state.active.index / track.stages.length * 100)}%"></span></div>
-      ${stage ? `<span class="stage-label">${escapeHtml(practiceCopy(stage.label, language))} · ABOUT ${stage.minutes} MIN</span><h2>${escapeHtml(stagePrompt)}</h2><p class="muted">${escapeHtml(practiceCopy(stage.hint, language))}</p>${lastFeedback ? feedbackCard(lastFeedback, lastAnswer.prompt) : ''}
-      <form id="answer-form"><input type="hidden" name="prompt" value="${escapeHtml(stagePrompt)}"><label for="answer">Your response</label><textarea id="answer" name="answer" required rows="8" placeholder="Write what you would say in the meeting…">${escapeHtml(state.active.draft ?? '')}</textarea><div class="voice-tools"><p class="voice-disclosure">Speech recognition may use a browser-managed service. This app stores only the transcript; review it before sending.</p><button type="button" class="button subtle" data-action="dictate">🎙 ${recognition ? 'Stop dictation' : 'Dictate in English'}</button><button type="button" class="button subtle" data-action="read-prompt">▶ Read prompt aloud</button><span id="voice-status" role="status">Voice support depends on your browser.</span></div>
-      <label class="consent-row"><input type="checkbox" name="ai-consent" ${feedbackAvailable ? '' : 'disabled'}><span><strong>Get optional AI feedback</strong><small>${feedbackAvailable ? 'This sends the current prompt, your response and up to 3 recent responses to the configured AI provider. Suggestions are unverified; review before using them.' : escapeHtml(feedbackUnavailableMessage())}</small></span></label>
+      <div class="practice-layout"><div class="panel practice-panel"><div class="progress-top"><span class="eyebrow">${escapeHtml(displayTrack(track, 'name').toUpperCase())}</span><span>STEP ${Math.min(state.active.index + 1, stageCount)} OF ${stageCount}</span></div>
+      <div class="progress-bar"><span style="width:${Math.round(state.active.index / stageCount * 100)}%"></span></div>
+      ${stage ? `<span class="stage-label">${escapeHtml(practiceCopy(stage.label, language))} · ABOUT ${stage.minutes} MIN</span><h2>${escapeHtml(stagePrompt)}</h2><p class="muted">${escapeHtml(practiceCopy(stage.hint, language))}</p>${lastAnswer?.evaluation ? `<div class="feedback-box" role="status"><strong>${lastAnswer.evaluation.correct ? 'Correct.' : 'Not quite.'}</strong> ${escapeHtml(lastAnswer.evaluation.explanation)}${!lastAnswer.evaluation.correct ? ` <span>${escapeHtml(`Correct answer: ${lastAnswer.evaluation.correctAnswer}`)}</span>` : ''}</div>` : ''}${lastFeedback ? feedbackCard(lastFeedback, lastAnswer.prompt) : ''}
+      <form id="answer-form"><input type="hidden" name="prompt" value="${escapeHtml(stagePrompt)}">${stage.mode === 'true_false' || stage.mode === 'multiple_choice' ? `<fieldset class="choice-options"><legend>${stage.mode === 'true_false' ? (language === 'pt-BR' ? 'Escolha verdadeiro ou falso' : 'Choose true or false') : (language === 'pt-BR' ? 'Escolha uma opção' : 'Choose one answer')}</legend>${stage.options.map(option => `<label class="choice-option"><input type="radio" name="answer" value="${escapeHtml(option.value)}" required><span>${escapeHtml(option.label)}</span></label>`).join('')}</fieldset>` : `<label for="answer">Your response</label><textarea id="answer" name="answer" required rows="8" placeholder="Write what you would say in the meeting…">${escapeHtml(state.active.draft ?? '')}</textarea>${!isAiConversation ? `<div class="voice-tools"><p class="voice-disclosure">Speech recognition may use a browser-managed service. This app stores only the transcript; review it before sending.</p><button type="button" class="button subtle" data-action="dictate">🎙 ${recognition ? 'Stop dictation' : 'Dictate in English'}</button><button type="button" class="button subtle" data-action="read-prompt">▶ Read prompt aloud</button><span id="voice-status" role="status">Voice support depends on your browser.</span></div>` : ''}`}
+      ${(state.active.index === stages.length - 1 || isAiConversation) ? `<label class="consent-row"><input type="checkbox" name="ai-consent" ${canUseAi ? '' : 'disabled'}><span><strong>${language === 'pt-BR' ? 'Praticar com o coach de IA' : 'Practice with the AI coach'}</strong><small>${canUseAi ? (language === 'pt-BR' ? 'Opcional. Depois das atividades e respostas abertas, a IA pode responder e fazer uma pergunta de acompanhamento. Seu prompt e sua resposta serão enviados somente com seu consentimento.' : 'Optional. After the guided exercises and open responses, the AI can reply and ask a follow-up question. Your prompt and answer are sent only with your consent.') : escapeHtml(feedbackUnavailableMessage())}</small></span></label>` : ''}
       <div class="form-actions"><button class="button primary" type="submit">Save & continue →</button><button type="button" class="button subtle" data-action="discard">Discard session</button></div></form>
-      ` : `<span class="stage-label">REFLECTION</span><h2>What will you say differently next time?</h2><p class="muted">Review your answers, then write one practical takeaway. Your self-assessment is yours; this version does not grade your English.</p><form id="finish-form"><label for="reflection">Your takeaway (optional)</label><textarea id="reflection" name="reflection" rows="4" placeholder="One thing I want to improve is…"></textarea><div class="rating-fields">${ratingFields()}</div><button class="button primary" type="submit">Complete session →</button></form>`}</div>
+      ` : `<span class="stage-label">REFLECTION</span><h2>What will you say differently next time?</h2><p class="muted">Review your answers, then write one practical takeaway. Your self-assessment is yours; this version does not grade your English.</p>${lastFeedback ? feedbackCard(lastFeedback, lastAnswer.prompt) : ''}<form id="finish-form"><label for="reflection">Your takeaway (optional)</label><textarea id="reflection" name="reflection" rows="4" placeholder="One thing I want to improve is…"></textarea><div class="rating-fields">${ratingFields()}</div><button class="button primary" type="submit">Complete session →</button></form>`}</div>
       <aside class="panel context-panel"><span class="eyebrow">YOUR SESSION</span><h3>${escapeHtml(displayTrack(track, 'name'))}</h3><p>${escapeHtml(displayTrack(track, 'intro'))}</p><div class="context-divider"></div><span class="eyebrow">RESPONSES</span>${state.active.answers.length ? state.active.answers.map(a => `<details><summary>${escapeHtml(a.stage)}</summary><p>${escapeHtml(a.text)}</p></details>`).join('') : '<p class="muted">Your responses will appear here as you go.</p>'}</aside></div>`;
   }
   return `${header('Choose your practice.', 'Three focused formats for technical communication in English.')}
@@ -122,7 +126,10 @@ root.addEventListener('submit', async event => {
       const track = tracks.find(t => t.id === active.trackId);
       const prompt = data.get('prompt');
       let feedback = null;
-      if (data.get('ai-consent') === 'on') {
+      const stages = stagesForSession(active, track);
+      const isAiConversation = active.index === stages.length && Boolean(active.conversationPrompt);
+      const canUseAi = active.index === stages.length - 1 || isAiConversation;
+      if (data.get('ai-consent') === 'on' && canUseAi) {
         const button = event.target.querySelector('[type="submit"]'); button.disabled = true; button.textContent = language === 'pt-BR' ? 'O coach está analisando…' : 'Coach is reviewing…';
         try {
           const response = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ track: track.name, prompt, answer, previousAnswers: active.answers }) });
@@ -157,7 +164,8 @@ root.addEventListener('click', event => {
   if (action === 'read-prompt') {
     if (!('speechSynthesis' in window)) return setNotice('Read aloud is not supported in this browser.');
     const active = state.active; const track = active && tracks.find(t => t.id === active.trackId); const nextPrompt = track?.stages[active.index];
-    const prompt = active?.index > 0 ? active.answers[active.index - 1]?.feedback?.follow_up || nextPrompt?.prompt : nextPrompt?.prompt;
+    const stages = active && track ? stagesForSession(active, track) : [];
+    const prompt = active?.conversationPrompt && active.index === stages.length ? active.conversationPrompt : active?.index > 0 ? active.answers[active.index - 1]?.feedback?.follow_up || nextPrompt?.prompt : nextPrompt?.prompt;
     speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(prompt); utterance.lang = 'en-US'; speechSynthesis.speak(utterance);
   }
   if (action === 'dictate') {

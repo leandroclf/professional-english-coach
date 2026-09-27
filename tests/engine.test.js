@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { tracks } from '../src/data.js';
-import { initialState, startSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
+import { initialState, startSession, stagesForSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
 
 test('a session preserves staged answers and completed history', () => {
   const track = tracks[2];
@@ -10,9 +10,37 @@ test('a session preserves staged answers and completed history', () => {
   for (const stage of track.stages) state = submitAnswer(state, track, `Response to ${stage.label}`);
   state = finishSession(state, 'State the evidence first.', { fluency: 3, argumentation: 4 }, new Date('2026-09-27T12:20:00Z'));
   assert.equal(state.active, null);
-  assert.equal(state.sessions[0].answers.length, 5);
+  assert.equal(state.sessions[0].answers.length, track.stages.length);
   assert.equal(state.sessions[0].reflection, 'State the evidence first.');
   assert.deepEqual(state.sessions[0].selfRatings, { fluency: 3, argumentation: 4 });
+});
+
+test('every track starts with true-false and multiple-choice checks before open responses', () => {
+  for (const track of tracks) {
+    assert.deepEqual(track.stages.slice(0, 2).map(stage => stage.mode), ['true_false', 'multiple_choice']);
+    assert.equal(track.stages[2].mode, undefined);
+    let state = startSession(initialState(), track);
+    state = submitAnswer(state, track, 'False');
+    assert.equal(state.active.answers[0].evaluation.correct, true);
+    state = submitAnswer(state, track, 'A');
+    assert.equal(state.active.answers[1].text, 'The queue maybe good.');
+    assert.equal(state.active.answers[1].evaluation.correct, false);
+    assert.equal(state.active.answers[1].evaluation.correctAnswer, 'The main trade-off is added latency in exchange for better isolation.');
+    state = submitAnswer(state, track, 'I would explain the trade-off with a concrete example.');
+    assert.equal(state.active.answers[2].evaluation, undefined);
+  }
+});
+
+test('an unfinished session from the previous curriculum keeps its original stage order', () => {
+  const track = tracks[0];
+  let state = startSession(initialState(), track);
+  state = submitAnswer(state, track, 'False');
+  const { stagePlan, ...legacyActive } = state.active;
+  legacyActive.index = 1;
+  state = { ...state, active: legacyActive };
+  assert.equal(stagesForSession(state.active, track)[1].label, 'Conversation');
+  state = submitAnswer(state, track, 'I would explain the decision and trade-offs.');
+  assert.equal(state.active.answers.at(-1).stage, 'Conversation');
 });
 
 test('a generated follow-up prompt is preserved with the learner answer', () => {
@@ -22,6 +50,25 @@ test('a generated follow-up prompt is preserved with the learner answer', () => 
   state = submitAnswer(state, track, 'A queue protects us from provider downtime.', { follow_up: generatedPrompt }, 'Why did you choose asynchronous processing?');
   assert.equal(state.active.answers[0].prompt, 'Why did you choose asynchronous processing?');
   assert.equal(state.active.answers[0].feedback.follow_up, generatedPrompt);
+});
+
+test('an opted-in AI follow-up opens one final conversation turn after open-ended practice', () => {
+  const track = tracks[0];
+  let state = startSession(initialState(), track);
+  for (let index = 0; index < track.stages.length - 1; index++) {
+    const stage = track.stages[index];
+    state = submitAnswer(state, track, stage.correctAnswer ?? `Response to ${stage.label}`);
+  }
+  const finalStage = track.stages.at(-1);
+  const followUp = 'What evidence would convince the team?';
+  state = submitAnswer(state, track, 'I would compare failure rates and recovery time.', { follow_up: followUp });
+  assert.equal(state.active.index, track.stages.length);
+  assert.equal(state.active.conversationPrompt, followUp);
+  state = submitAnswer(state, track, 'I would compare both measures against the current baseline.', { follow_up: 'A second question' }, followUp);
+  assert.equal(state.active.answers.at(-1).stage, 'AI conversation');
+  assert.equal(state.active.index, track.stages.length + 1);
+  assert.throws(() => submitAnswer(state, track, 'More'), /Session is already complete/);
+  assert.equal(finalStage.mode, undefined);
 });
 
 test('review recall advances spacing and a retry resets it', () => {

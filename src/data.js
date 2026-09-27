@@ -32,6 +32,33 @@ export const tracks = [
   }
 ];
 
+// Short, low-pressure English checks precede every open-ended professional prompt.
+const foundations = [
+  {
+    label: 'Quick check · true or false', mode: 'true_false', minutes: 1,
+    prompt: 'True or false: “I am agree with this design” is correct English.',
+    hint: 'Choose the sentence form you would use in a meeting.',
+    options: [{ value: 'True', label: 'True' }, { value: 'False', label: 'False' }],
+    correctAnswer: 'False', explanation: 'Use “I agree with this design.” The verb agree does not take am here.'
+  },
+  {
+    label: 'Quick check · multiple choice', mode: 'multiple_choice', minutes: 1,
+    prompt: 'Which sentence clearly presents a technical trade-off?',
+    hint: 'Look for both the cost and the benefit.',
+    options: [
+      { value: 'A', label: 'The queue maybe good.' },
+      { value: 'B', label: 'The main trade-off is added latency in exchange for better isolation.' },
+      { value: 'C', label: 'Queue is because we choose.' }
+    ],
+    correctAnswer: 'B', explanation: 'A clear trade-off names both sides: added latency and better isolation.'
+  }
+];
+
+for (const track of tracks) {
+  track.legacyStages = track.stages;
+  track.stages = [...foundations.map(stage => ({ ...stage, options: stage.options.map(option => ({ ...option })) })), ...track.legacyStages];
+}
+
 export const expressions = [
   'The main trade-off is…',
   'From an operational standpoint…',

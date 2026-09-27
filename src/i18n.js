@@ -139,6 +139,11 @@ const ptBR = {
   'REVIEWS': 'REVISÕES',
   'HISTORY': 'HISTÓRICO',
   'Unknown track': 'Trilha desconhecida',
+  'Choose true or false': 'Escolha verdadeiro ou falso',
+  'Choose one answer': 'Escolha uma opção',
+  'Correct.': 'Correto.',
+  'Not quite.': 'Ainda não.',
+  'Correct answer:': 'Resposta correta:',
   'THE COACH IS REVIEWING…': 'O COACH ESTÁ ANALISANDO…',
   'English': 'Inglês',
   'Português': 'Português'
@@ -151,6 +156,9 @@ const portugueseTracks = Object.freeze({
 });
 
 const portugueseStages = Object.freeze({
+  'Quick check · true or false': 'Exercício rápido · verdadeiro ou falso',
+  'Quick check · multiple choice': 'Exercício rápido · múltipla escolha',
+  'AI conversation': 'Conversa com IA',
   'Warm-up': 'Aquecimento',
   'State the decision first, then the constraint that mattered most.': 'Apresente a decisão primeiro e, depois, a restrição mais importante.',
   'Context → choice → effect. Give a concrete example.': 'Contexto → escolha → efeito. Dê um exemplo concreto.',

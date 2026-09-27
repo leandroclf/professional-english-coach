@@ -15,8 +15,9 @@ test('localized track copy and stage directions leave practice prompts in Englis
   const track = tracks.find(item => item.id === 'conversation');
   assert.equal(trackCopy(track, 'pt-BR').name, 'Conversação e fluência');
   assert.equal(trackCopy(track, 'en').name, track.name);
-  assert.equal(practiceCopy(track.stages[0].hint, 'pt-BR'), 'Apresente a decisão primeiro e, depois, a restrição mais importante.');
-  assert.equal(track.stages[0].prompt, 'What technical decision did you make recently, and what made it difficult?');
+  assert.equal(practiceCopy(track.stages[2].hint, 'pt-BR'), 'Apresente a decisão primeiro e, depois, a restrição mais importante.');
+  assert.equal(track.stages[2].prompt, 'What technical decision did you make recently, and what made it difficult?');
+  assert.equal(practiceCopy(track.stages[0].label, 'pt-BR'), 'Exercício rápido · verdadeiro ou falso');
 });
 
 test('Portuguese interface copy is translated without modifying protected learner content', () => {
