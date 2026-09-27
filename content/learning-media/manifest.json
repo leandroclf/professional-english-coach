@@ -1,0 +1,55 @@
+{
+  "generatedWith": "FFmpeg / libflite kal",
+  "voiceCloning": false,
+  "ownerAuthorization": "personal-and-family-use; existing-public-hosting-accepted",
+  "rightsStatus": "not-independently-reviewed",
+  "humanReview": "waived-by-owner",
+  "audio": [
+    {
+      "id": "introductions",
+      "path": "src/assets/audio/introductions.mp3",
+      "transcript": "I am Alex. I work on the payments team."
+    },
+    {
+      "id": "clarification",
+      "path": "src/assets/audio/clarification.mp3",
+      "transcript": "Could you explain the deadline again?"
+    },
+    {
+      "id": "updates",
+      "path": "src/assets/audio/updates.mp3",
+      "transcript": "I finished the tests. I am working on the report."
+    },
+    {
+      "id": "requests",
+      "path": "src/assets/audio/requests.mp3",
+      "transcript": "Could you review the proposal by Friday?"
+    },
+    {
+      "id": "tradeoffs",
+      "path": "src/assets/audio/tradeoffs.mp3",
+      "transcript": "We accept higher cost in exchange for faster delivery."
+    },
+    {
+      "id": "disagreement",
+      "path": "src/assets/audio/disagreement.mp3",
+      "transcript": "I see your point, but I am concerned about the risk."
+    },
+    {
+      "id": "evidence",
+      "path": "src/assets/audio/evidence.mp3",
+      "transcript": "I recommend a pilot because the results are promising."
+    },
+    {
+      "id": "recovery",
+      "path": "src/assets/audio/recovery.mp3",
+      "transcript": "If the service fails, we will retry the request."
+    }
+  ],
+  "video": {
+    "path": "src/assets/video/introductions.mp4",
+    "captions": "src/assets/video/introductions.vtt",
+    "transcript": "I am Alex. I work on the payments team.",
+    "description": "Original two-part text explanation: name or role, then current work."
+  }
+}

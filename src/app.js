@@ -1,3 +1,6 @@
+import { units } from './curriculum.js';
+import { renderLearning, renderLearningHistory } from './learning-view.js';
+import { learningState, setLearningPreferences, startLearning, beginLearning, learningDraft, revealLearningHelp, answerLearning, continueLearning, pauseLearning } from './learning-engine.js';
 import { tracks, expressions } from './data.js';
 import { isMediaAssetEnabled, mediaAssets } from './media-assets.js';
 import { STORAGE_KEY, loadState, saveState, startSession, stagesForSession, saveDraft, submitAnswer, skipOptionalStage, finishSession, addReview, reviewItem, dueReviews, exportData, initialState } from './engine.js';
@@ -9,6 +12,8 @@ let language;
 try { language = preferredLanguage(localStorage.getItem(LANGUAGE_KEY), navigator.language); }
 catch { language = preferredLanguage('', navigator.language); }
 let view = 'overview';
+let learningQuery = '';
+function learning() { return renderLearning(state, language, escapeHtml, learningQuery); }
 let revealedReview = null;
 let notice = '';
 let feedbackAvailable = false;
@@ -33,13 +38,14 @@ const ratingLabels = { fluency: 'Fluency', precision: 'Precision', vocabulary: '
 const ratingFields = () => Object.entries(ratingLabels).map(([key, label]) => `<label for="rating-${key}">${label} <span class="muted">(1 = needs work, 5 = felt strong)</span></label><select id="rating-${key}" name="rating-${key}"><option value="">Not rated</option>${[1,2,3,4,5].map(value => `<option value="${value}">${value}</option>`).join('')}</select>`).join('');
 const feedbackCard = (feedback, context = '') => `<div class="feedback-box"><span class="eyebrow">COACH SUGGESTION · REVIEW BEFORE REUSE</span>${feedback.critical ? `<p><strong>Clarity:</strong> ${escapeHtml(feedback.critical)}</p>` : ''}${feedback.accuracy ? `<p><strong>Language:</strong> ${escapeHtml(feedback.accuracy)}</p>` : ''}${feedback.observed_form && feedback.preferred_form ? `<p><strong>Pattern:</strong> ${escapeHtml(feedback.observed_form)} → ${escapeHtml(feedback.preferred_form)}</p><button class="button subtle" data-action="save-correction" data-original="${escapeHtml(feedback.observed_form)}" data-improved="${escapeHtml(feedback.preferred_form)}" data-context="${escapeHtml(context)}">Add this correction to review ↗</button>` : ''}<p><strong>Natural version:</strong> ${escapeHtml(feedback.natural_version)}</p><p><strong>Reusable expression:</strong> ${escapeHtml(feedback.reusable_expression)}</p><p><strong>Follow-up:</strong> ${escapeHtml(feedback.follow_up)}</p></div>`;
 
-function update(next) { state = next; saveState(localStorage, state); render(); }
+function update(next) { state = next; try { saveState(localStorage, state); } catch { notice = language === 'pt-BR' ? 'Não foi possível salvar neste navegador. Exporte seus dados antes de sair.' : 'Could not save in this browser. Export your data before leaving.'; } render(); }
 function setNotice(message) { notice = translateText(message, language); render(); }
 function navigation() {
   return `<aside class="sidebar"><a class="skip-link" href="#main-content">Skip to main content</a><a class="brand" href="#overview"><span class="brand-mark">P<span>↗</span></span><span>PROFESSIONAL<br><strong>ENGLISH COACH</strong></span></a>
     <div class="side-label">YOUR WORKSPACE</div>
     <nav aria-label="Main navigation">
       <a href="#overview" class="nav-link ${view === 'overview' ? 'active' : ''}">◫ <span>Overview</span></a>
+      <a href="#learning" class="nav-link ${view === 'learning' ? 'active' : ''}">✦ <span>${language === 'pt-BR' ? 'Trilha de aprendizagem' : 'Learning path'}</span></a>
       <a href="#practice" class="nav-link ${view === 'practice' ? 'active' : ''}">◉ <span>Practice room</span></a>
       <a href="#reviews" class="nav-link ${view === 'reviews' ? 'active' : ''}">◇ <span>Review deck</span>${dueReviews(state).length ? `<b>${dueReviews(state).length}</b>` : ''}</a>
       <a href="#history" class="nav-link ${view === 'history' ? 'active' : ''}">▤ <span>History</span></a>
@@ -49,7 +55,7 @@ function navigation() {
 }
 
 function header(title, subtitle) {
-  const viewName = language === 'pt-BR' ? ({ overview: 'VISÃO GERAL', practice: 'PRÁTICA', reviews: 'REVISÕES', history: 'HISTÓRICO' })[view] : view.toUpperCase();
+  const viewName = language === 'pt-BR' ? ({ overview: 'VISÃO GERAL', practice: 'PRÁTICA', reviews: 'REVISÕES', history: 'HISTÓRICO', learning: 'APRENDIZAGEM' })[view] : view.toUpperCase();
   const status = state.active ? 'Practice in progress' : 'Ready to practice';
   return `<div class="page-top"><div><p class="eyebrow">THE WORKSPACE / ${escapeHtml(viewName)}</p><h1>${title}</h1><p class="subtext">${subtitle}</p></div><div class="header-controls"><div class="language-switch" role="group" aria-label="Interface language"><button type="button" data-language="en" aria-pressed="${language === 'en'}">EN</button><button type="button" data-language="pt-BR" aria-pressed="${language === 'pt-BR'}">PT-BR</button></div><div class="top-actions"><span class="status-dot"></span> ${status}</div></div></div>`;
 }
@@ -58,6 +64,7 @@ function overview() {
   const completed = state.sessions.length;
   const due = dueReviews(state).length;
   return `${header('Speak with clarity.<br><em>Lead with confidence.</em>', 'Deliberate practice for the conversations that matter at work.')}
+    <section class="panel learning-summary"><span class="eyebrow">${language === 'pt-BR' ? 'COMECE AQUI' : 'START HERE'}</span><h2>${language === 'pt-BR' ? 'Inglês passo a passo, do básico à aplicação' : 'English step by step, from foundations to application'}</h2><p>${language === 'pt-BR' ? 'Oito lições com explicações, áudio e revisões. Comece com verdadeiro/falso e múltipla escolha.' : 'Eight lessons with explanations, audio and review. Start with true/false and multiple choice.'}</p><a class="button primary" href="#learning">${language === 'pt-BR' ? 'Abrir minha trilha →' : 'Open my learning path →'}</a></section>
     <section class="hero"><div><span class="pill">YOUR NEXT MOVE</span><h2>${state.active ? 'Your practice is waiting.' : 'Make your thinking heard.'}</h2>
     <p>${state.active ? 'Continue where you left off. Your answers are saved on this device.' : 'A focused session is a small investment in how you communicate every day.'}</p><a class="button primary" href="#practice">${state.active ? 'Continue session' : 'Start a practice session'} <span>↗</span></a></div><div class="hero-art" aria-hidden="true"><div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><div class="core">✦</div></div></section>
     <div class="section-title"><div><span class="eyebrow">AT A GLANCE</span><h2>Your progress</h2></div><span class="muted">Built one conversation at a time</span></div>
@@ -127,14 +134,14 @@ function reviews() {
 
 function history() {
   return `${header('Your history', 'A record of the arguments you practiced and the ideas you sharpened.')}
-    <div class="panel history-panel"><div class="history-head"><div><span class="eyebrow">YOUR RECORD</span><h2>${state.sessions.length} completed ${state.sessions.length === 1 ? 'session' : 'sessions'}</h2></div><div class="form-actions"><button class="button subtle" data-action="export">Export data</button><button class="button danger" data-action="clear">Delete all data</button></div></div>
+    ${renderLearningHistory(state, language, escapeHtml)}<div class="panel history-panel"><div class="history-head"><div><span class="eyebrow">YOUR RECORD</span><h2>${state.sessions.length} completed ${state.sessions.length === 1 ? 'session' : 'sessions'}</h2></div><div class="form-actions"><button class="button subtle" data-action="export">Export data</button><button class="button danger" data-action="clear">Delete all data</button></div></div>
     ${state.sessions.length ? state.sessions.map(s => `<details class="history-item"><summary><span><strong>${escapeHtml(displayTrack(tracks.find(t => t.id === s.trackId) ?? { id: s.trackId, name: s.trackId, intro: '', day: '' }, 'name'))}</strong><small>${dateLabel(s.completedAt)} · ${s.answers.filter(answer => !answer.skipped).length} responses</small></span><span>View session +</span></summary>${s.answers.map(a => `<div class="history-answer"><small>${escapeHtml(practiceCopy(a.stage, language))} · ${escapeHtml(a.prompt)}</small><p>${a.skipped ? (language === 'pt-BR' ? 'Atividade opcional ignorada.' : 'Optional activity skipped.') : escapeHtml(a.text)}</p>${a.evaluation?.transcript ? `<p><strong>${language === 'pt-BR' ? 'Transcrição' : 'Transcript'}:</strong> <span lang="en">${escapeHtml(a.evaluation.transcript)}</span></p>` : ''}${a.feedback ? feedbackCard(a.feedback, a.prompt) : ''}</div>`).join('')}<div class="history-answer">${s.selfRatings && Object.keys(s.selfRatings).length ? `<small>SELF-REFLECTION RATINGS · NOT A PROFICIENCY SCORE</small><p>${Object.entries(ratingLabels).filter(([key]) => s.selfRatings[key]).map(([key,label]) => `${escapeHtml(label)}: ${escapeHtml(s.selfRatings[key])}/5`).join(" · ")}</p>` : ""}</div><div class="history-answer"><small>REFLECTION</small><p>${escapeHtml(s.reflection || translateText('No reflection recorded.', language))}</p></div></details>`).join('') : '<p class="empty-note">Your completed sessions will appear here. Start with one focused practice.</p>'}</div>`;
 }
 
 function render() {
-  view = ['overview', 'practice', 'reviews', 'history'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'overview';
+  view = ['overview', 'practice', 'reviews', 'history', 'learning'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'overview';
   dynamicValues = [];
-  const markup = `${navigation()}<main id="main-content" class="main" tabindex="-1"><div class="content">${notice ? `<div class="notice" role="status">${escapeHtml(notice)} <button data-action="dismiss" aria-label="Dismiss notification">×</button></div>` : ''}${({ overview, practice, reviews, history })[view]()}</div><footer>PROFESSIONAL ENGLISH COACH <span>THINK CLEARLY. SPEAK CONFIDENTLY.</span></footer></main>`;
+  const markup = `${navigation()}<main id="main-content" class="main" tabindex="-1"><div class="content">${notice ? `<div class="notice" role="status">${escapeHtml(notice)} <button data-action="dismiss" aria-label="Dismiss notification">×</button></div>` : ''}${({ overview, practice, reviews, history, learning })[view]()}</div><footer>PROFESSIONAL ENGLISH COACH <span>THINK CLEARLY. SPEAK CONFIDENTLY.</span></footer></main>`;
   root.innerHTML = translateMarkup(markup, language).replace(/__COACH_DYNAMIC_(\d+)__/g, (_, index) => dynamicValues[Number(index)] ?? '');
   document.documentElement.lang = language;
   document.title = language === 'pt-BR' ? 'Professional English Coach — Prática de inglês profissional' : 'Professional English Coach';
@@ -144,6 +151,9 @@ root.addEventListener('submit', async event => {
   event.preventDefault();
   try {
     const data = new FormData(event.target);
+    if (event.target.id === 'learning-answer-form') { update(answerLearning(state, data.get('answer'), data.get('confidence'))); return; }
+    if (event.target.id === 'learning-preferences') { update(setLearningPreferences(state, Number(data.get('goal')), data.get('mode'))); setNotice(language === 'pt-BR' ? 'Plano salvo.' : 'Plan saved.'); return; }
+    if (event.target.id === 'learning-search') { learningQuery = String(data.get('query') ?? ''); render(); return; }
     if (event.target.id === 'answer-form') {
       const answer = data.get('answer');
       const active = state.active;
@@ -184,6 +194,21 @@ root.addEventListener('click', event => {
     return;
   }
   const { action, track, id } = button.dataset;
+  if (action.startsWith('learn-')) {
+    try {
+      if (action === 'learn-start' || action === 'learn-mixed') update(startLearning(state, button.dataset.unit, learningState(state).mode, action === 'learn-mixed'));
+      if (action === 'learn-begin') update(beginLearning(state));
+      if (action === 'learn-help') update(revealLearningHelp(state));
+      if (action === 'learn-continue') update(continueLearning(state));
+      if (action === 'learn-skip') update(answerLearning(state, '', 'unsure', true));
+      if (action === 'learn-discard' && confirm(language === 'pt-BR' ? 'Descartar esta lição inacabada?' : 'Discard this unfinished lesson?')) update(pauseLearning(state));
+      if (action === 'learn-speed') { const audio = button.closest('.learning-audio')?.querySelector('audio'); if (audio) audio.playbackRate = Number(button.dataset.speed); }
+      if (action === 'learn-chunk') { const active = learningState(state).active; const chunk = active.questions[active.index].chunks[Number(button.dataset.index)]; update(learningDraft(state, [active.draft, chunk].filter(Boolean).join(' '))); }
+      if (action === 'learn-reset-sentence') update(learningDraft(state, ''));
+      if (action === 'learn-bookmark') { const unit = units.find(item => item.id === button.dataset.unit); update(addReview(state, { original: unit.meaning, improved: unit.example, context: unit.title[language] })); setNotice(language === 'pt-BR' ? 'Expressão salva para revisar amanhã.' : 'Phrase saved for review tomorrow.'); }
+    } catch (error) { setNotice(language === 'pt-BR' ? 'Não foi possível concluir esta ação. Continue a lição atual ou escolha uma resposta válida.' : error.message); }
+    return;
+  }
   if (action === 'dismiss') { notice = ''; render(); }
   if (action === 'read-prompt') {
     if (!('speechSynthesis' in window)) return setNotice('Read aloud is not supported in this browser.');
@@ -224,6 +249,11 @@ root.addEventListener('click', event => {
 
 addEventListener('hashchange', render);
 root.addEventListener('input', event => {
+  if (event.target.closest('#learning-answer-form') && event.target.name === 'answer') {
+    state = learningDraft(state, event.target.value);
+    try { saveState(localStorage, state); } catch { /* In-memory draft remains available. */ }
+    return;
+  }
   if (event.target.id !== 'answer' || !state.active) return;
   state = saveDraft(state, event.target.value);
   try { saveState(localStorage, state); } catch { /* Keep the current response in the editor if storage is unavailable. */ }

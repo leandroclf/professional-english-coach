@@ -1,0 +1,15 @@
+# Proposed tasks — not completed
+- [ ] Migrate all learner data into isolated family profiles.
+- [ ] Implement validated import and conflict-safe restore.
+- [ ] Add version-aware offline/PWA support.
+- [ ] Expand variants, lexical data and graded reading.
+- [ ] Configure hosted AI backend with secrets, consent and budget limits.
+- [ ] Add local recording/replay and evaluate speech compatibility.
+- [ ] Evaluate pronunciation modeling and meaningful assessment validity.
+- [ ] Add additional original videos, voices and contextual content.
+- [ ] Implement opt-in reminders/calendar integration.
+- [ ] Design descriptive portfolio rubrics and comparable tasks.
+- [ ] Evaluate item-level adaptive review using actual history.
+- [ ] Implement deliberate human sharing, tutoring or community workflows.
+- [ ] Implement secure accounts and synchronization if needed.
+- [ ] Evaluate learning outcomes separately from software correctness.

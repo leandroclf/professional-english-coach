@@ -1,6 +1,14 @@
 import { access, cp, mkdir, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { mediaAssets } from '../src/media-assets.js';
+import { units } from '../src/curriculum.js';
+
+for (const unit of units) {
+  if (!unit.example || !unit.meaning) throw new Error(`Missing text alternative for ${unit.id}`);
+  await access(resolve('src/assets/audio', `${unit.id}.mp3`));
+}
+await access(resolve('src/assets/video/introductions.mp4'));
+await access(resolve('src/assets/video/introductions.vtt'));
 
 for (const [assetId, asset] of Object.entries(mediaAssets)) {
   if (asset.status === 'enabled') {

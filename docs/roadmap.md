@@ -29,3 +29,9 @@ Prioritize the next step using observed use, not the number of features. The Sit
 ## 5. Human conversation practice — future discovery
 
 Explore human-led sessions only after validating the guided-to-open-to-AI text progression. Define tutor identity and vetting, scheduling, safeguarding, learner-content handling, consent, moderation, accessibility and operating costs before building any matching or live conversation features. No human tutor feature is present today.
+
+## Evidence-informed learning release — September 2026
+
+Shipped: eight bilingual micro-lessons, 64 authored activities at maximum support progression, eight new synthetic audio clips, one captioned original video, recognition/guided/applied modes, due/error-based recommendations, mixed retrieval, explicit feedback, help tracking, weekly goals and persistent learning history. See [competitive analysis](competitive-analysis.md) for the complete implementation matrix and prioritized future dependencies.
+
+The broader roadmap remains proposed: family profiles, validated backup restore, offline/PWA, hosted AI with cost controls, recording and pronunciation evaluation, richer lexical/content banks, reminders, human interaction and cloud sync. They are not marked implemented merely because they are listed. Human quality reviews remain optional future evaluation, not release gates for this owner's personal/family use.

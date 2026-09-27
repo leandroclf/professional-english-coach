@@ -9,6 +9,14 @@ A text-first practice space for advanced English in backend engineering, archite
 
 New sessions begin with a short bilingual learning objective, explanation and English worked example before true/false and multiple-choice practice. An optional replayable audio-cloze uses a locally generated English sample with an in-app transcript. The owner authorized personal/family use and accepted public hosting; pronunciation and tool/voice output rights were not independently reviewed. Learner responses continue to stay local unless the learner separately opts into the existing AI text feedback.
 
+## Learning path / Trilha de aprendizagem
+
+Open **Learning path / Trilha de aprendizagem** for eight new bilingual micro-lessons with original audio. The default Recognition mode ends after true/false and multiple choice. Guided mode adds sentence ordering, optional listening completion and one sentence; Applied mode adds real-life transfer, scripted dialogue and rewriting. The first lesson also includes a captioned instructional video.
+
+The local planner suggests due lessons, then new topics. Feedback, assistance tracking, confidence reflection, weekly goals, mixed retrieval and searchable lessons are available without an API key. Answers and drafts persist locally and are included in History → Export data / Delete all data. Open responses are ungraded; activity counts are not proficiency scores. The scripted dialogue is not AI.
+
+Research and implementation decisions: [competitive analysis (Portuguese)](docs/competitive-analysis.md), [academic rationale](docs/research.md), [current learning-path spec](openspec/specs/learning-path/spec.md). Broader suggestions and dependencies are explicitly tracked as future work.
+
 ## Run locally
 
 Requires Node.js 20+. No package installation is required. The practice app works without an AI API key; speech recognition depends on browser support.
@@ -33,6 +41,9 @@ The Sites deployment serves the static practice app over HTTPS. Practice session
 | Path | Responsibility |
 |---|---|
 | `src/data.js` | Practice scenarios and reusable expressions |
+| `src/curriculum.js` | Eight original bilingual lessons and progressive exercise definitions |
+| `src/learning-engine.js` | Learning runs, recommendations, goals and review scheduling |
+| `src/learning-view.js` | Learning library, lesson UI and history |
 | `src/engine.js` | Pure state transitions and review scheduling |
 | `src/app.js` | Browser UI and actions |
 | `src/i18n.js` | Interface language selection and localized copy |
