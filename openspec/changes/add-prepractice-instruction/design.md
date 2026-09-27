@@ -19,6 +19,8 @@ The sequence should not force every learner through every media format. Each les
 
 Represent each lesson as authored, version-controlled content rather than provider-generated instruction. Keep the objective, localized explanation and directions, English model example, exercise data and optional media metadata together so their ordering is reviewable. A listening exercise needs an audio asset, an expected missing word/phrase, a replay control and transcript text. Store asset attribution and license information with each non-original media asset.
 
+The implementation stores the bilingual lesson unit with the new session plan so active sessions keep their curriculum snapshot; pre-existing sessions without that unit keep their original stage plan and do not receive new activities mid-session. Optional audio exercises are included in new plans only when the asset catalog marks the file, human review and rights review approved. The build rejects a catalog item marked approved when its static file is absent or review gates are incomplete. Candidate files live outside `src/` and are not copied into the site.
+
 ## Optional media-authoring workflow
 
 VoiceStudio is a candidate local production tool, not a product dependency. An author may use it to draft English narration, dub an existing instructional clip, or create a draft transcript. Authoring can also use another tool or a human speaker; no lesson may depend on VoiceStudio being installed or running. Keep source text and editable originals with the content-authoring materials where licensing permits, and publish only reviewed, browser-playable assets in the static bundle.

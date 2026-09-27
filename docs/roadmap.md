@@ -2,7 +2,7 @@
 
 ## 0. Foundation — implemented, browser acceptance pending
 
-Text scenarios, progressive true/false and multiple-choice practice, a short guided sentence, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. This sequence is research-informed but has not been evaluated for learning outcomes in this product. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
+Text scenarios, progressive true/false and multiple-choice practice, a short guided sentence, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. Each new session now begins with an objective, concise localized explanation and English worked example before the first check. The short audio-cloze flow is implemented but remains gated until its static sample passes human pronunciation/transcript and redistribution-rights review. The sequence is research-informed but has not been evaluated for learning outcomes in this product. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
 
 ## 1. Research and measurement
 
@@ -15,6 +15,10 @@ See `openspec/changes/add-ai-feedback/`. Opt-in OpenAI Responses API feedback, a
 ## 3. Voice and presentation
 
 See `openspec/changes/add-voice-practice/`. Browser dictation into an editable response and prompt playback are implemented. Gate: target-browser acceptance and accent/domain transcription evaluation. Audio recording, replay, real-time turn taking and oral scoring require a separate design; any rubric needs calibrated human comparison.
+
+### Media authoring pilot
+
+See `openspec/changes/add-prepractice-instruction/`. A Colab-compatible review notebook and a locally generated audio candidate support media QA. The candidate is intentionally excluded from the static build until human listening review, transcript confirmation, and voice/model redistribution terms are recorded as approved. No learner voice, VoiceStudio server or generated-media service is sent to or hosted by the app.
 
 ## 4. Longitudinal product
 

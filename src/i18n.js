@@ -167,7 +167,11 @@ const portugueseTracks = Object.freeze({
 const portugueseStages = Object.freeze({
   'Quick check · true or false': 'Exercício rápido · verdadeiro ou falso',
   'Quick check · multiple choice': 'Exercício rápido · múltipla escolha',
+  'Listening · complete the phrase': 'Compreensão oral · complete a expressão',
   'Guided sentence · one idea': 'Frase guiada · uma ideia',
+  'Choose the sentence form you would use to agree with a recommendation.': 'Escolha a forma da frase que usaria para concordar com uma recomendação.',
+  'Listen for the cost named after “The main trade-off is”. You can replay the clip.': 'Ouça para identificar o custo mencionado depois de “The main trade-off is”. Você pode repetir o áudio.',
+  'Optional activity skipped': 'Atividade opcional ignorada',
   'Write one specific sentence. State the choice and the reason from your own experience.': 'Escreva uma frase específica. Diga qual foi a escolha e o motivo, com base na sua experiência.',
   'Keep the tone constructive. Add one reason that connects to the team’s goal.': 'Mantenha um tom construtivo. Acrescente um motivo ligado ao objetivo da equipe.',
   'Name a concrete decision and the evidence you would use to support it.': 'Indique uma decisão concreta e as evidências que usaria para sustentá-la.',

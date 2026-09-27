@@ -1,0 +1,26 @@
+{
+  "assetId": "tradeoff-phrase",
+  "status": "pending-human-review",
+  "candidatePath": "content/media-candidates/tradeoff-phrase.mp3",
+  "contentType": "audio/mpeg",
+  "language": "en-US",
+  "durationSeconds": 4.36,
+  "sizeBytes": 26463,
+  "sampleRateHz": 22050,
+  "channels": 1,
+  "script": "The main trade-off is higher latency in exchange for better isolation.",
+  "generatedBy": "FFmpeg 6.1.1 / libflite",
+  "voice": "kal",
+  "referenceRecordingUsed": false,
+  "generatedOn": "2026-09-27",
+  "redistributionRights": "pending-review",
+  "humanReview": {
+    "reviewer": null,
+    "reviewedOn": null,
+    "pronunciationMatchesScript": null,
+    "transcriptMatchesAudio": null,
+    "redistributionTermsVerified": null,
+    "status": "pending"
+  },
+  "publicationStatus": "excluded-from-static-build"
+}

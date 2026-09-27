@@ -26,6 +26,14 @@ For new sessions, the sequence is now (1) true/false recognition, (2) multiple-c
 
 The next evidence gate is not adding a proficiency score. It is observing completion and learner usability, then comparing repeated writing samples on comparable technical tasks with independent human ratings. Spoken claims require spoken tasks and calibrated human raters. Without that evaluation, the interface must remain an ungraded practice tool.
 
+### Pre-practice teaching and media design (September 2026)
+
+The product now places a short objective, explanation and worked example before the first exercise of a new session because the project owner requested explicit teaching before practice. A 2023 meta-analytic review of prequestioning found that asking questions before instruction can support later learning when learners can study the correct answers, with effects depending on the material and test. This evidence does not show that instruction-first is generally superior. The present ordering is a product choice for clarity and learner preference; the app makes no claim that it is optimal.
+
+Multimedia-learning research describes limited processing capacity and recommends learner-paced, focused material. Accordingly, written instruction is the complete baseline; audio and video are optional, short and objective-linked. Text alternatives, captions/transcripts, user-controlled playback and no autoplay are required. Research syntheses on L2 captioned viewing report potential listening and vocabulary benefits with variation across measures and learner groups; this is a rationale for a small listening-comprehension pilot, not a forecast of outcomes for technical English in this app.
+
+The first listening exercise is implemented as a short cloze behind a media-review gate: after an asset is approved, the learner may replay a pre-authored English statement, type a missing phrase, then see the transcript and feedback. The answer is local and the learner can skip the optional activity. It does not assess hearing, pronunciation or proficiency. Audio generation tools, including VoiceStudio, remain authoring choices only. A generated file stays outside the learner-facing bundle until a person verifies pronunciation and transcript accuracy and the project records the model/voice and redistribution rights.
+
 | Design choice | Evidence and interpretation | Limit |
 |---|---|---|
 | Workplace scenarios and interaction | The CEFR Companion Volume includes descriptors for interaction, mediation and phonological control. Dialogue-based computer-assisted language-learning research reports speaking-development benefits across studies. We model architecture review, disagreement and presentation as meaningful tasks. | The first release is text-only and scripted, so evidence about dialogue and oral skill cannot be directly transferred to this experience. |
@@ -50,6 +58,9 @@ The next evidence gate is not adding a proficiency score. It is observing comple
 13. Tabari, M. A. et al. (2025), [Task repetition and L2 written performance: A meta-analysis](https://doi.org/10.1016/j.jslw.2025.101255), *Journal of Second Language Writing*.
 14. Duolingo, [The Duolingo Method](https://blog.duolingo.com/duolingo-teaching-method/) and [Spaced Repetition](https://blog.duolingo.com/spaced-repetition-for-learning/), first-party product explanations.
 15. Busuu, [Methodology](https://www.busuu.com/en/it-works/busuu-methodology), [community corrections](https://www.busuu.com/en/how-to/corrections), and [Mistake Repair](https://help.busuu.com/hc/en-us/articles/30418575225106-What-is-Mistake-Repair-and-how-can-it-help-me-learn-a-language), first-party product explanations.
+16. Pan, S. C. et al. (2023), [Guessing as a learning intervention: A meta-analytic review of the prequestion effect](https://doi.org/10.3758/s13423-023-02353-8), *Psychonomic Bulletin & Review*.
+17. Mayer, R. E. (2009), [Applying the science of learning: Evidence-based principles for the design of multimedia instruction](https://pubmed.ncbi.nlm.nih.gov/19014238/), *American Psychologist*.
+18. Montero Perez, M., Van Den Noortgate, W. & Desmet, P. (2013), [Captioned video for L2 listening and vocabulary learning: A meta-analysis](https://doi.org/10.1016/j.system.2013.07.013), *System*.
 
 ## Validation plan
 

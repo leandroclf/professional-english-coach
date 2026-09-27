@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createAppServer } from '../server.js';
+import { createAppServer, types } from '../server.js';
 
 async function withServer(config, run) {
   const server = createAppServer(config);
@@ -48,4 +48,10 @@ test('app serves its entry point and rejects unsupported methods', async () => {
     assert.equal((await fetch(`${base}/.git/config`)).status, 403);
     assert.equal((await fetch(`${base}/api/status`, { method: 'DELETE' })).status, 405);
   });
+});
+
+test('static server assigns browser media types for audio, video and captions', () => {
+  assert.equal(types['.mp3'], 'audio/mpeg');
+  assert.equal(types['.mp4'], 'video/mp4');
+  assert.equal(types['.vtt'], 'text/vtt; charset=utf-8');
 });

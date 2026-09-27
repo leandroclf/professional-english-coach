@@ -1,3 +1,5 @@
+import { isMediaAssetApproved, mediaAssets } from './media-assets.js';
+
 export const tracks = [
   {
     id: 'conversation', number: '01', name: 'Conversation & fluency', day: 'MONDAY', minutes: 15,
@@ -32,14 +34,43 @@ export const tracks = [
   }
 ];
 
+const learningUnit = {
+  objective: {
+    en: 'Say what you support and name a cost and a benefit of a technical decision.',
+    'pt-BR': 'Diga o que você apoia e apresente um custo e um benefício de uma decisão técnica.'
+  },
+  explanation: {
+    en: 'To agree, say “I agree with + an idea or thing.” Do not put “am” before agree. To compare two sides, say “The main trade-off is [cost] in exchange for [benefit].”',
+    'pt-BR': 'Para concordar, diga “I agree with + uma ideia ou coisa”. Não use “am” antes de agree. Para comparar dois lados, diga “The main trade-off is [custo] in exchange for [benefício].”'
+  },
+  example: 'I agree with adding a queue. The main trade-off is higher latency in exchange for better isolation.',
+  mediaAssetIds: [],
+  breakdown: {
+    en: 'The first sentence says what the speaker supports. The second names the cost (higher latency) and benefit (better isolation).',
+    'pt-BR': 'A primeira frase diz o que a pessoa apoia. A segunda apresenta o custo (maior latência) e o benefício (melhor isolamento).'
+  }
+};
+
+const listeningClozeCandidate = {
+  label: 'Listening · complete the phrase', mode: 'audio_cloze', optional: true, minutes: 1,
+  prompt: 'Complete the sentence: “The main trade-off is ___ in exchange for better isolation.”',
+  hint: 'Listen for the cost named after “The main trade-off is”. You can replay the clip.',
+  placeholder: 'Type the missing phrase…',
+  acceptedAnswers: ['higher latency'],
+  correctAnswer: 'higher latency',
+  explanation: 'The speaker names “higher latency” as the cost and “better isolation” as the benefit.',
+  transcript: 'The main trade-off is higher latency in exchange for better isolation.',
+  mediaAssetId: 'tradeoff-phrase'
+};
+
 // Short, low-pressure English checks precede every open-ended professional prompt.
 const foundations = [
   {
     label: 'Quick check · true or false', mode: 'true_false', minutes: 1,
-    prompt: 'True or false: “I am agree with this design” is correct English.',
-    hint: 'Choose the sentence form you would use in a meeting.',
+    prompt: 'True or false: “I am agree with adding a queue” is correct English.',
+    hint: 'Choose the sentence form you would use to agree with a recommendation.',
     options: [{ value: 'True', label: 'True' }, { value: 'False', label: 'False' }],
-    correctAnswer: 'False', explanation: 'Use “I agree with this design.” The verb agree does not take am here.'
+    correctAnswer: 'False', explanation: 'Use “I agree with adding a queue.” The verb agree does not take am here.'
   },
   {
     label: 'Quick check · multiple choice', mode: 'multiple_choice', minutes: 1,
@@ -70,13 +101,19 @@ const guidedFrames = {
 };
 
 for (const track of tracks) {
+  track.lesson = { ...learningUnit };
   track.legacyStages = track.stages;
   const copiedFoundations = foundations.map(stage => ({ ...stage, options: stage.options.map(option => ({ ...option })) }));
-  track.stages = [...copiedFoundations, {
+  const listeningStages = isMediaAssetApproved(listeningClozeCandidate.mediaAssetId)
+    ? [{ ...listeningClozeCandidate, media: mediaAssets[listeningClozeCandidate.mediaAssetId] }]
+    : [];
+  track.stages = [...copiedFoundations, ...listeningStages, {
     label: 'Guided sentence · one idea', mode: 'guided_response', minutes: 2,
     ...guidedFrames[track.id], placeholder: 'Write one sentence in your own words…'
   }, ...track.legacyStages];
 }
+
+export { listeningClozeCandidate };
 
 export const expressions = [
   'The main trade-off is…',

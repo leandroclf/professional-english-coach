@@ -1,8 +1,8 @@
 schema: spec-driven
 context: |
   Professional English Coach is a browser-based practice tool for advanced professional English.
-  Current release: single learner with local-only data, progressive text exercises (true/false, multiple choice, one guided sentence, then open responses), optional browser speech recognition/playback, and opt-in server-side AI suggestions after authored exercises.
-  Proposed next evolution: pre-practice teaching with written explanations, optional authored audio/video, and listening cloze activities. VoiceStudio may be evaluated as an optional local content-authoring tool; it is not a runtime dependency or a service exposed to learners. Generated media requires human review, accessible text alternatives, provenance and license checks before inclusion in the static site.
+  Current implementation: single learner with local-only data, a bilingual pre-practice objective/explanation/worked example for new sessions, progressive text exercises, optional browser speech recognition/playback, and opt-in server-side AI suggestions after authored exercises. An audio cloze is implemented behind a static-asset review gate; no unreviewed media is exposed in the learner build.
+  Optional lesson audio/video uses reviewed static assets with text alternatives; VoiceStudio may be evaluated as a local content-authoring tool but is not a runtime dependency or a service exposed to learners. Generated media requires human review, accessible text alternatives, provenance and license checks before inclusion in the static site.
   There is no validated language assessment, CEFR score, pronunciation score, account, cloud sync, or public hosting design.
   Write testable requirements with MUST/SHALL and GIVEN/WHEN/THEN scenarios.
   Distinguish shipped behavior from proposed changes. Never claim CEFR certification or learning outcomes.

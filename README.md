@@ -7,6 +7,8 @@ Total output lines: 71
 
 A text-first practice space for advanced English in backend engineering, architecture reviews, technical leadership and presentations. The goal is to practice formulating and defending ideas before seeing the next prompt.
 
+New sessions begin with a short bilingual learning objective, explanation and English worked example before true/false and multiple-choice practice. An optional audio-cloze activity is implemented but remains hidden until its authored audio passes human pronunciation/transcript and redistribution-rights review. Learner responses continue to stay local unless the learner separately opts into the existing AI text feedback.
+
 ## Run locally
 
 Requires Node.js 20+. No package installation is required. The practice app works without an AI API key; speech recognition depends on browser support.
@@ -34,6 +36,7 @@ The Sites deployment serves the static practice app over HTTPS. Practice session
 | `src/engine.js` | Pure state transitions and review scheduling |
 | `src/app.js` | Browser UI and actions |
 | `src/i18n.js` | Interface language selection and localized copy |
+| `src/media-assets.js` | Media rights/review gate for static lesson assets |
 | `src/coach.js` | Response schema, input shaping and provider request |
 | `server.js` | Local-only static server and optional feedback endpoint |
 | `scripts/build-static.mjs` | Static asset build for Sites hosting |
@@ -41,6 +44,8 @@ The Sites deployment serves the static practice app over HTTPS. Practice session
 | `docs/research.md` | Research rationale and limits |
 | `docs/roadmap.md` | Prioritized implementation stages and release gates |
 | `docs/acceptance.md` | Completed automated checks and remaining manual acceptance |
+| `content/media-candidates/` | Local-only candidate audio script and review manifest; generated audio is Git-ignored and excluded from the build |
+| `notebooks/lesson_media_review.ipynb` | Colab-compatible technical inspection and human-review worksheet for authored audio |
 | `openspec/changes/` | Current and proposed behavior changes |
 
 ## Privacy and limitations

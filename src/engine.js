@@ -25,7 +25,8 @@ export function stagesForSession(active, track) {
 export function startSession(state, track, now = new Date()) {
   if (state.active) throw new Error('Finish or discard the current session first.');
   const stagePlan = track.stages.map(stage => ({ ...stage, ...(stage.options ? { options: stage.options.map(option => ({ ...option })) } : {}) }));
-  return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0, draft: '', stagePlan } };
+  const lessonPlan = track.lesson ? JSON.parse(JSON.stringify(track.lesson)) : null;
+  return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0, draft: '', ...(lessonPlan ? { lessonPlan } : {}), stagePlan } };
 }
 
 export function submitAnswer(state, track, answer, feedback = null, prompt = null) {
@@ -37,10 +38,12 @@ export function submitAnswer(state, track, answer, feedback = null, prompt = nul
   if (state.active.index >= stages.length && !isAiConversation) throw new Error('Session is already complete.');
   const stage = stages[state.active.index] ?? { label: 'AI conversation', prompt: state.active.conversationPrompt };
   const recordedText = stage.options?.find(option => option.value === text)?.label ?? text;
+  const normalize = value => String(value).trim().toLocaleLowerCase().replace(/[.!?]+$/g, '').replace(/\s+/g, ' ');
   const evaluation = stage.correctAnswer ? {
-    correct: text === stage.correctAnswer,
-    correctAnswer: stage.options.find(option => option.value === stage.correctAnswer)?.label ?? stage.correctAnswer,
-    explanation: stage.explanation
+    correct: (stage.acceptedAnswers ?? [stage.correctAnswer]).some(answer => normalize(answer) === normalize(text)),
+    correctAnswer: stage.options?.find(option => option.value === stage.correctAnswer)?.label ?? stage.correctAnswer,
+    explanation: stage.explanation,
+    ...(stage.transcript ? { transcript: stage.transcript } : {})
   } : null;
   const active = {
     ...state.active,
@@ -52,6 +55,20 @@ export function submitAnswer(state, track, answer, feedback = null, prompt = nul
   return { ...state, active };
 }
 
+export function skipOptionalStage(state, track) {
+  if (!state.active || state.active.trackId !== track.id) throw new Error('No matching active session.');
+  const stages = stagesForSession(state.active, track);
+  const stage = stages[state.active.index];
+  if (!stage?.optional) throw new Error('Only an optional activity can be skipped.');
+  const active = {
+    ...state.active,
+    answers: [...state.active.answers, { stage: stage.label, prompt: stage.prompt, text: '', skipped: true }],
+    index: state.active.index + 1,
+    draft: ''
+  };
+  return { ...state, active };
+}
+
 export function saveDraft(state, draft) {
   if (!state.active) return state;
   return { ...state, active: { ...state.active, draft: String(draft ?? '') } };
@@ -59,7 +76,7 @@ export function saveDraft(state, draft) {
 
 export function finishSession(state, reflection, selfRatings = {}, now = new Date()) {
   if (!state.active) throw new Error('No active session.');
-  const { stagePlan, ...sessionData } = state.active;
+  const { stagePlan, lessonPlan, ...sessionData } = state.active;
   const session = { ...sessionData, reflection: reflection.trim(), selfRatings, completedAt: now.toISOString() };
   return { ...state, active: null, sessions: [session, ...state.sessions] };
 }

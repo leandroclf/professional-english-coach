@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { tracks } from '../src/data.js';
-import { initialState, startSession, stagesForSession, saveDraft, submitAnswer, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
+import { tracks, listeningClozeCandidate } from '../src/data.js';
+import { isMediaAssetApproved } from '../src/media-assets.js';
+import { initialState, startSession, stagesForSession, saveDraft, submitAnswer, skipOptionalStage, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
 
 test('a session preserves staged answers and completed history', () => {
   const track = tracks[2];
@@ -13,6 +14,7 @@ test('a session preserves staged answers and completed history', () => {
   assert.equal(state.sessions[0].answers.length, track.stages.length);
   assert.equal(state.sessions[0].reflection, 'State the evidence first.');
   assert.deepEqual(state.sessions[0].selfRatings, { fluency: 3, argumentation: 4 });
+  assert.equal('lessonPlan' in state.sessions[0], false);
 });
 
 test('every track progresses from recognition through guided production to open responses', () => {
@@ -39,12 +41,59 @@ test('an unfinished session from the previous curriculum keeps its original stag
   const track = tracks[0];
   let state = startSession(initialState(), track);
   state = submitAnswer(state, track, 'False');
-  const { stagePlan, ...legacyActive } = state.active;
+  const { stagePlan, lessonPlan, ...legacyActive } = state.active;
+  assert.equal(lessonPlan.objective.en.length > 0, true);
   legacyActive.index = 1;
   state = { ...state, active: legacyActive };
   assert.equal(stagesForSession(state.active, track)[1].label, 'Conversation');
   state = submitAnswer(state, track, 'I would explain the decision and trade-offs.');
   assert.equal(state.active.answers.at(-1).stage, 'Conversation');
+});
+
+test('new sessions save the bilingual lesson plan while legacy sessions remain unchanged', () => {
+  const track = tracks[0];
+  const state = startSession(initialState(), track);
+  assert.equal(state.active.lessonPlan.objective.en, track.lesson.objective.en);
+  assert.equal(state.active.lessonPlan.objective['pt-BR'], track.lesson.objective['pt-BR']);
+  assert.notEqual(state.active.lessonPlan, track.lesson);
+
+  const { lessonPlan, ...legacyActive } = state.active;
+  assert.equal(lessonPlan.objective.en.length > 0, true);
+  assert.equal(legacyActive.lessonPlan, undefined);
+  assert.equal(stagesForSession(legacyActive, track)[0].mode, 'true_false');
+});
+
+test('unreviewed audio candidates are excluded from new learner sessions', () => {
+  assert.equal(isMediaAssetApproved(listeningClozeCandidate.mediaAssetId), false);
+  assert.equal(tracks.some(track => track.stages.some(stage => stage.mode === 'audio_cloze')), false);
+});
+
+test('audio cloze accepts case and terminal punctuation, then reveals its transcript', () => {
+  const track = {
+    ...tracks[0],
+    stages: [listeningClozeCandidate, ...tracks[0].stages]
+  };
+  let state = startSession(initialState(), track);
+  state = submitAnswer(state, track, 'HIGHER LATENCY!');
+  const answer = state.active.answers[0];
+  assert.equal(answer.evaluation.correct, true);
+  assert.equal(answer.evaluation.correctAnswer, 'higher latency');
+  assert.match(answer.evaluation.transcript, /higher latency/);
+  assert.equal(answer.feedback, undefined);
+});
+
+test('optional listening can be skipped without recording a learner response', () => {
+  const track = { ...tracks[0], stages: [listeningClozeCandidate, ...tracks[0].stages] };
+  let state = startSession(initialState(), track);
+  state = skipOptionalStage(state, track);
+  assert.equal(state.active.index, 1);
+  assert.deepEqual(state.active.answers[0], {
+    stage: listeningClozeCandidate.label,
+    prompt: listeningClozeCandidate.prompt,
+    text: '',
+    skipped: true
+  });
+  assert.throws(() => skipOptionalStage(state, track), /Only an optional activity can be skipped/);
 });
 
 test('a generated follow-up prompt is preserved with the learner answer', () => {
