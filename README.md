@@ -19,6 +19,10 @@ The web app uses browser-native JavaScript modules and stores learner data in yo
 
 The local Node server keeps provider credentials out of the browser. To enable optional AI feedback, copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `OPENAI_MODEL` to a supported model in your OpenAI API account. API use is billed separately from a ChatGPT subscription. After the learner opts in for a response, the app sends its prompt, response and up to three recent responses to the configured provider. The `.env` file is ignored by Git. The server binds to `127.0.0.1` by default and does not log learner text. Never commit credentials.
 
+## Hosted version
+
+The Sites deployment serves the static practice app over HTTPS. Practice sessions, history and review items remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so AI feedback is unavailable there.
+
 ## Current experience
 
 - Conversation, technical leadership and presentation tracks, each with sequential prompts and reflection.

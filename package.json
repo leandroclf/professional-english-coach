@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
+    "build": "node scripts/build-static.mjs",
     "test": "node --test",
     "check": "node --check server.js && node --check src/app.js && node --check src/engine.js && node --check src/coach.js && node --test"
   }
