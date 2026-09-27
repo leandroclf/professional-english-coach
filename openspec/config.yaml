@@ -1,6 +1,7 @@
 schema: spec-driven
 context: |
   Professional English Coach is a browser-based practice tool for advanced professional English.
-  Current release: text-based, single learner, local-only persistence, no automated language assessment.
+  Current release: single learner with local-only data, staged text practice, optional browser speech recognition/playback, and opt-in server-side AI suggestions.
+  There is no validated language assessment, CEFR score, pronunciation score, account, cloud sync, or public hosting design.
   Write testable requirements with MUST/SHALL and GIVEN/WHEN/THEN scenarios.
   Distinguish shipped behavior from proposed changes. Never claim CEFR certification or learning outcomes.

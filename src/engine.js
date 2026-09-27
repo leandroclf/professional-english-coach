@@ -23,21 +23,21 @@ export function startSession(state, track, now = new Date()) {
   return { ...state, active: { id: crypto.randomUUID(), trackId: track.id, startedAt: now.toISOString(), answers: [], index: 0 } };
 }
 
-export function submitAnswer(state, track, answer) {
+export function submitAnswer(state, track, answer, feedback = null, prompt = null) {
   if (!state.active || state.active.trackId !== track.id) throw new Error('No matching active session.');
   const text = answer.trim();
   if (!text) throw new Error('Write a response before continuing.');
   if (state.active.index >= track.stages.length) throw new Error('Session is already complete.');
   return { ...state, active: {
     ...state.active,
-    answers: [...state.active.answers, { stage: track.stages[state.active.index].label, prompt: track.stages[state.active.index].prompt, text }],
+    answers: [...state.active.answers, { stage: track.stages[state.active.index].label, prompt: prompt || track.stages[state.active.index].prompt, text, ...(feedback ? { feedback } : {}) }],
     index: state.active.index + 1
   } };
 }
 
-export function finishSession(state, reflection, now = new Date()) {
+export function finishSession(state, reflection, selfRatings = {}, now = new Date()) {
   if (!state.active) throw new Error('No active session.');
-  const session = { ...state.active, reflection: reflection.trim(), completedAt: now.toISOString() };
+  const session = { ...state.active, reflection: reflection.trim(), selfRatings, completedAt: now.toISOString() };
   return { ...state, active: null, sessions: [session, ...state.sessions] };
 }
 

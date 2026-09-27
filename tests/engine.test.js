@@ -8,10 +8,20 @@ test('a session preserves staged answers and completed history', () => {
   let state = startSession(initialState(), track, new Date('2026-09-27T12:00:00Z'));
   assert.throws(() => submitAnswer(state, track, '   '), /Write a response/);
   for (const stage of track.stages) state = submitAnswer(state, track, `Response to ${stage.label}`);
-  state = finishSession(state, 'State the evidence first.', new Date('2026-09-27T12:20:00Z'));
+  state = finishSession(state, 'State the evidence first.', { fluency: 3, argumentation: 4 }, new Date('2026-09-27T12:20:00Z'));
   assert.equal(state.active, null);
   assert.equal(state.sessions[0].answers.length, 5);
   assert.equal(state.sessions[0].reflection, 'State the evidence first.');
+  assert.deepEqual(state.sessions[0].selfRatings, { fluency: 3, argumentation: 4 });
+});
+
+test('a generated follow-up prompt is preserved with the learner answer', () => {
+  const track = tracks[0];
+  let state = startSession(initialState(), track);
+  const generatedPrompt = 'What evidence would show the queue is worth its cost?';
+  state = submitAnswer(state, track, 'A queue protects us from provider downtime.', { follow_up: generatedPrompt }, 'Why did you choose asynchronous processing?');
+  assert.equal(state.active.answers[0].prompt, 'Why did you choose asynchronous processing?');
+  assert.equal(state.active.answers[0].feedback.follow_up, generatedPrompt);
 });
 
 test('review recall advances spacing and a retry resets it', () => {

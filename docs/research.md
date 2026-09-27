@@ -17,6 +17,8 @@ This is a research-informed product rationale, not evidence that this applicatio
 4. [A review of laboratory studies of adult second language vocabulary training](https://www.cambridge.org/core/journals/studies-in-second-language-acquisition/article/review-of-laboratory-studies-of-adult-second-language-vocabulary-training/18F0A5D1FFC829CE05931B2EEE83124A/share/9612bae4e131a6e3d9d0b0aacac044f5587eb6e0), *Studies in Second Language Acquisition*.
 5. [The effects of distributed practice on second language fluency development](https://www.cambridge.org/core/journals/studies-in-second-language-acquisition/article/effects-of-distributed-practice-on-second-language-fluency-development/4F6787916C198376CAD222934D3B37E4), *Studies in Second Language Acquisition*.
 6. [Optimizing distributed practice online](https://www.cambridge.org/core/journals/studies-in-second-language-acquisition/article/optimizing-distributed-practice-online/C833408A4C3BAD939CA39EA734423BB7), *Studies in Second Language Acquisition*.
+7. OpenAI, [Developer quickstart](https://platform.openai.com/docs/quickstart/make-your-first-api-request), documenting the server-side Responses API pattern. The coach integration uses a structured response and keeps the API key on the local server.
+8. MDN, [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) and [SpeechRecognition compatibility notes](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition), documenting the separate synthesis/recognition interfaces and limited browser availability of recognition.
 
 ## Validation plan
 

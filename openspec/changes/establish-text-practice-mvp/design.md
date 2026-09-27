@@ -4,7 +4,7 @@
 
 1. Browser-native ES modules with no runtime dependency. Run through a static server; `node --test` verifies pure session/review logic. This reduces setup cost for the initial single-user prototype.
 2. `localStorage` stores a versioned snapshot. Responses are private to the current browser profile, but browser storage is not encrypted or a durable backup. Export enables portability. No telemetry is sent by the app.
-3. The session engine is deterministic: prompts are authored, responses are never scored. Corrections are entered by the learner and explicitly described as unverified.
+3. Authored session prompts provide the baseline. If the learner opts in to AI feedback and a provider is configured, a returned follow-up can replace the next prompt; otherwise the authored prompt is used. Responses are never scored. Provider suggestions are explicitly described as unverified.
 4. Review intervals start at 1, 3, 7, 14 and 30 days. Recall advances one step; a retry returns to one day. These are product defaults to evaluate, not a research-validated optimum for this learner.
 
 ## Trade-offs
