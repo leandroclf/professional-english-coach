@@ -15,4 +15,4 @@ ffmpeg -hide_banner -y \
   -metadata language=eng \
   content/media-candidates/tradeoff-phrase.mp3
 
-echo "Candidate only. It is Git-ignored and excluded from the site until human and rights review are approved."
+echo "Locally generated sample saved under content/media-candidates. Compare its script, duration and size before replacing the learner-facing asset."

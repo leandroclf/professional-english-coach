@@ -2,7 +2,7 @@
 
 ## 0. Foundation — implemented, browser acceptance pending
 
-Text scenarios, progressive true/false and multiple-choice practice, a short guided sentence, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. Each new session now begins with an objective, concise localized explanation and English worked example before the first check. The short audio-cloze flow is implemented but remains gated until its static sample passes human pronunciation/transcript and redistribution-rights review. The sequence is research-informed but has not been evaluated for learning outcomes in this product. Acceptance: run the application in a browser, complete all stages, refresh mid-session, verify review reveal and export, check mobile layout and keyboard navigation.
+Text scenarios, progressive true/false and multiple-choice practice, a short guided sentence, open responses, optional post-exercise AI text exchange, local history, manual expression review, export/delete and unit tests. Each new session now begins with an objective, concise localized explanation and English worked example before the first check. A short optional audio-cloze with transcript is enabled using a locally generated sample under the owner's personal-use authorization. Its voice/output rights were not independently reviewed, as accepted by the owner. The sequence is research-informed but has not been evaluated for learning outcomes in this product. Automated tests and static-build validation are the current acceptance gate; usability and browser-specific issues can be corrected from observed feedback.
 
 ## 1. Research and measurement
 
@@ -18,7 +18,7 @@ See `openspec/changes/add-voice-practice/`. Browser dictation into an editable r
 
 ### Media authoring pilot
 
-See `openspec/changes/add-prepractice-instruction/`. A Colab-compatible review notebook and a locally generated audio candidate support media QA. The candidate is intentionally excluded from the static build until human listening review, transcript confirmation, and voice/model redistribution terms are recorded as approved. No learner voice, VoiceStudio server or generated-media service is sent to or hosted by the app.
+See `openspec/changes/archive/2026-09-27-add-prepractice-instruction/`. A Colab-compatible optional inspection notebook and a locally generated audio sample support lesson media. The clip is included under the owner's explicit authorization; rights and pronunciation are recorded as not independently reviewed. No learner voice, VoiceStudio server or generated-media service is sent to or hosted by the app.
 
 ## 4. Longitudinal product
 

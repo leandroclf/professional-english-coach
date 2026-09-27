@@ -1,4 +1,4 @@
-import { isMediaAssetApproved, mediaAssets } from './media-assets.js';
+import { isMediaAssetEnabled, mediaAssets } from './media-assets.js';
 
 export const tracks = [
   {
@@ -44,7 +44,7 @@ const learningUnit = {
     'pt-BR': 'Para concordar, diga “I agree with + uma ideia ou coisa”. Não use “am” antes de agree. Para comparar dois lados, diga “The main trade-off is [custo] in exchange for [benefício].”'
   },
   example: 'I agree with adding a queue. The main trade-off is higher latency in exchange for better isolation.',
-  mediaAssetIds: [],
+  mediaAssetIds: ['tradeoff-phrase'],
   breakdown: {
     en: 'The first sentence says what the speaker supports. The second names the cost (higher latency) and benefit (better isolation).',
     'pt-BR': 'A primeira frase diz o que a pessoa apoia. A segunda apresenta o custo (maior latência) e o benefício (melhor isolamento).'
@@ -104,7 +104,7 @@ for (const track of tracks) {
   track.lesson = { ...learningUnit };
   track.legacyStages = track.stages;
   const copiedFoundations = foundations.map(stage => ({ ...stage, options: stage.options.map(option => ({ ...option })) }));
-  const listeningStages = isMediaAssetApproved(listeningClozeCandidate.mediaAssetId)
+  const listeningStages = isMediaAssetEnabled(listeningClozeCandidate.mediaAssetId)
     ? [{ ...listeningClozeCandidate, media: mediaAssets[listeningClozeCandidate.mediaAssetId] }]
     : [];
   track.stages = [...copiedFoundations, ...listeningStages, {

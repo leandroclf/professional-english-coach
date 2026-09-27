@@ -1,6 +1,6 @@
 {
   "assetId": "tradeoff-phrase",
-  "status": "pending-human-review",
+  "status": "enabled-by-owner-authorization",
   "candidatePath": "content/media-candidates/tradeoff-phrase.mp3",
   "contentType": "audio/mpeg",
   "language": "en-US",
@@ -13,14 +13,14 @@
   "voice": "kal",
   "referenceRecordingUsed": false,
   "generatedOn": "2026-09-27",
-  "redistributionRights": "pending-review",
+  "redistributionRights": "not-independently-reviewed; public-site use explicitly accepted by owner for personal/family project",
   "humanReview": {
-    "reviewer": null,
+    "reviewer": "not-required-by-owner",
     "reviewedOn": null,
     "pronunciationMatchesScript": null,
     "transcriptMatchesAudio": null,
     "redistributionTermsVerified": null,
-    "status": "pending"
+    "status": "waived-by-owner; not independently assessed"
   },
-  "publicationStatus": "excluded-from-static-build"
+  "publicationStatus": "included-in-static-build-by-owner-authorization"
 }

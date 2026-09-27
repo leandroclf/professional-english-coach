@@ -29,24 +29,25 @@ Lessons MUST use written instruction as a complete baseline and MAY include opti
 - **AND** the source and license of externally sourced media are recorded
 
 ### Requirement: Keep media authoring separate from the learner runtime
-The lesson experience MUST use reviewed, version-controlled static media assets and MUST NOT require VoiceStudio or call its desktop app, local API, MCP server, remote workers or model runtime. VoiceStudio MAY be used as an optional local authoring tool. Every included asset MUST have documented provenance and rights sufficient for redistribution, and a human MUST review generated speech and its transcript/captions before publication.
+The lesson experience MUST use version-controlled static media assets and MUST NOT require VoiceStudio or call its desktop app, local API, MCP server, remote workers or model runtime. VoiceStudio MAY be used as an optional local authoring tool. Every included asset MUST have documented provenance and text alternative, with independent review status clearly recorded. For this personal/family project, the owner MAY explicitly authorize use without human or rights review; this authorization MUST NOT be represented as legal clearance.
 
-#### Scenario: Author prepares a generated narration
+#### Scenario: Owner authorizes a generated narration without review
 - **GIVEN** an author uses VoiceStudio or another tool to draft lesson audio
 - **WHEN** the asset is prepared for a lesson
-- **THEN** a reviewer checks the audio against the approved script, including technical terms and names
-- **AND** the final audio has a verified transcript and recorded source, applicable voice/model license, generation provenance and review status
-- **AND** the learner-facing site consumes only the approved static asset
+- **THEN** the asset has a transcript, source/generation provenance and explicit authorization metadata
+- **AND** unreviewed pronunciation and rights status are stated as unreviewed
+- **AND** the learner-facing site consumes only the static asset with owner authorization
 
 #### Scenario: VoiceStudio is unavailable
 - **GIVEN** a learner opens a lesson
 - **WHEN** VoiceStudio is not installed or running
 - **THEN** all lesson and media playback features included in the site continue to work
 
-#### Scenario: Rights or provenance cannot be confirmed
+#### Scenario: Owner has not authorized an asset
 - **GIVEN** an asset's source, voice permission, model terms or redistribution rights are unclear
 - **WHEN** the lesson package is reviewed
-- **THEN** that asset is not published until the rights are resolved or the asset is replaced
+- **THEN** that asset remains excluded until its owner authorization is recorded
+- **AND** recorded authorization does not imply that rights were independently verified
 
 #### Scenario: Future online voice service is proposed
 - **GIVEN** a future change proposes calling a VoiceStudio API/MCP service or processing learner audio remotely

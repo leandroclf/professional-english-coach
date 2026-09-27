@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { tracks, listeningClozeCandidate } from '../src/data.js';
-import { isMediaAssetApproved } from '../src/media-assets.js';
+import { isMediaAssetEnabled } from '../src/media-assets.js';
 import { initialState, startSession, stagesForSession, saveDraft, submitAnswer, skipOptionalStage, finishSession, addReview, reviewItem, dueReviews, loadState, saveState, STORAGE_KEY } from '../src/engine.js';
 
 test('a session preserves staged answers and completed history', () => {
@@ -19,8 +19,8 @@ test('a session preserves staged answers and completed history', () => {
 
 test('every track progresses from recognition through guided production to open responses', () => {
   for (const track of tracks) {
-    assert.deepEqual(track.stages.slice(0, 3).map(stage => stage.mode), ['true_false', 'multiple_choice', 'guided_response']);
-    assert.equal(track.stages[3].mode, undefined);
+    assert.deepEqual(track.stages.slice(0, 4).map(stage => stage.mode), ['true_false', 'multiple_choice', 'audio_cloze', 'guided_response']);
+    assert.equal(track.stages[4].mode, undefined);
     let state = startSession(initialState(), track);
     state = submitAnswer(state, track, 'False');
     assert.equal(state.active.answers[0].evaluation.correct, true);
@@ -28,10 +28,12 @@ test('every track progresses from recognition through guided production to open 
     assert.equal(state.active.answers[1].text, 'The queue maybe good.');
     assert.equal(state.active.answers[1].evaluation.correct, false);
     assert.equal(state.active.answers[1].evaluation.correctAnswer, 'The main trade-off is added latency in exchange for better isolation.');
+    state = skipOptionalStage(state, track);
+    assert.equal(state.active.answers[2].skipped, true);
     state = submitAnswer(state, track, 'I chose asynchronous processing because it improves recovery.');
-    assert.equal(state.active.answers[2].evaluation, undefined);
-    assert.equal(state.active.answers[2].stage, 'Guided sentence · one idea');
-    assert.match(state.active.answers[2].prompt, /Complete this frame/);
+    assert.equal(state.active.answers[3].evaluation, undefined);
+    assert.equal(state.active.answers[3].stage, 'Guided sentence · one idea');
+    assert.match(state.active.answers[3].prompt, /Complete this frame/);
     state = submitAnswer(state, track, 'I would explain the trade-off with a concrete example.');
     assert.equal(state.active.answers[3].evaluation, undefined);
   }
@@ -63,9 +65,10 @@ test('new sessions save the bilingual lesson plan while legacy sessions remain u
   assert.equal(stagesForSession(legacyActive, track)[0].mode, 'true_false');
 });
 
-test('unreviewed audio candidates are excluded from new learner sessions', () => {
-  assert.equal(isMediaAssetApproved(listeningClozeCandidate.mediaAssetId), false);
-  assert.equal(tracks.some(track => track.stages.some(stage => stage.mode === 'audio_cloze')), false);
+test('owner-authorized audio is available with transcript and explicit unreviewed-rights metadata', () => {
+  assert.equal(isMediaAssetEnabled(listeningClozeCandidate.mediaAssetId), true);
+  assert.equal(tracks.every(track => track.stages.some(stage => stage.mode === 'audio_cloze')), true);
+  assert.equal(tracks.every(track => track.lesson.mediaAssetIds.includes(listeningClozeCandidate.mediaAssetId)), true);
 });
 
 test('audio cloze accepts case and terminal punctuation, then reveals its transcript', () => {

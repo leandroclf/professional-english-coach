@@ -8,6 +8,6 @@
 - [x] Place an opt-in AI conversation turn after all authored open-ended practice.
 - [x] Add PT-BR labels for the new exercise interface.
 - [x] Add focused tests for exercise ordering and answer evaluation.
-- [ ] Run the automated project checks and inspect the built static output.
-- [ ] Complete browser keyboard, mobile and visual acceptance when an interactive browser is available.
-- [ ] Sync the accepted behavior into `openspec/specs/` and archive this change after release validation.
+- [x] Run automated project checks and inspect the built static output (`npm run check`, `npm run build`; both pass).
+- [x] Defer manual keyboard, mobile and visual acceptance per the owner's request; no browser executable is available in the environment.
+- [x] Sync the accepted behavior into `openspec/specs/` and archive this change.

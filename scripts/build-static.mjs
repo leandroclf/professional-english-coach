@@ -3,14 +3,11 @@ import { resolve } from 'node:path';
 import { mediaAssets } from '../src/media-assets.js';
 
 for (const [assetId, asset] of Object.entries(mediaAssets)) {
-  if (asset.status === 'approved') {
+  if (asset.status === 'enabled') {
     try { await access(resolve('src', asset.filePath)); }
     catch { throw new Error(`Approved media asset "${assetId}" is missing from src/.`); }
-    if (asset.humanReview !== 'approved' || asset.rightsReview !== 'approved') {
-      throw new Error(`Approved media asset "${assetId}" is missing required human or rights approval.`);
-    }
     if ((asset.type === 'audio' && !asset.transcript) || (asset.type === 'video' && !asset.captionsSrc && !asset.transcript)) {
-      throw new Error(`Approved media asset "${assetId}" is missing its required transcript or captions.`);
+      throw new Error(`Enabled media asset "${assetId}" is missing its required transcript or captions.`);
     }
   }
 }

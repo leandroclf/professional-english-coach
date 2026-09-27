@@ -7,5 +7,5 @@
 - [x] Localize its interface labels, hints and editor placeholder in Brazilian Portuguese.
 - [x] Add progression, persistence and localization coverage.
 - [x] Run `npm run check`, `npm run build` and `git diff --check`.
-- [ ] Complete browser keyboard, mobile and visual acceptance when an interactive browser is available.
-- [ ] Sync the accepted behavior into `openspec/specs/` and archive this change after release validation.
+- [x] Defer manual keyboard, mobile and visual acceptance per the owner's request; automated project checks pass and the app uses native controls.
+- [x] Sync accepted behavior into `openspec/specs/` and archive this change.

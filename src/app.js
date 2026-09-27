@@ -1,5 +1,5 @@
 import { tracks, expressions } from './data.js';
-import { isMediaAssetApproved, mediaAssets } from './media-assets.js';
+import { isMediaAssetEnabled, mediaAssets } from './media-assets.js';
 import { STORAGE_KEY, loadState, saveState, startSession, stagesForSession, saveDraft, submitAnswer, skipOptionalStage, finishSession, addReview, reviewItem, dueReviews, exportData, initialState } from './engine.js';
 import { LANGUAGE_KEY, LANGUAGES, preferredLanguage, practiceCopy, trackCopy, translateMarkup, translateText } from './i18n.js';
 
@@ -72,7 +72,7 @@ function lessonUnit(lesson) {
   if (!lesson) return '';
   const localized = language === 'pt-BR' ? 'pt-BR' : 'en';
   const media = (lesson.mediaAssetIds ?? []).map(id => ({ id, asset: mediaAssets[id] }))
-    .filter(({ id, asset }) => asset && isMediaAssetApproved(id))
+    .filter(({ id, asset }) => asset && isMediaAssetEnabled(id))
     .map(({ asset }) => asset);
   const mediaMarkup = media?.map(asset => `<div class="lesson-media">
     ${asset.type === 'video'

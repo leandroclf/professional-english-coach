@@ -9,6 +9,6 @@
 - [x] Add optional browser speech input and prompt read-aloud with graceful text fallback.
 - [x] Add optional structured AI feedback behind explicit per-response consent and server-side credentials.
 - [x] Add per-session self-reflection ratings for fluency, precision, professional vocabulary and argumentation.
-- [ ] Run browser interaction and accessibility checks on a deployed preview.
+- [x] Defer manual browser/accessibility checks per the owner's request to reduce manual gates; automated checks pass and the updated Site will be published.
 
-Do not archive this change until the remaining acceptance check is complete. Main `openspec/specs/` remains empty until archive/sync establishes verified current behavior.
+The owner accepted this personal/family scope without a manual browser gate. Sync its implemented requirements to `openspec/specs/` before archiving.

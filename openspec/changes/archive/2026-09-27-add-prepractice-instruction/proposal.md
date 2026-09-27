@@ -12,15 +12,13 @@ The current practice path asks learners to answer true/false and multiple-choice
 - Add an audio-comprehension activity in which the learner listens to an English clip and completes a missing word or phrase; show the transcript and answer-specific explanation after submission.
 - Require captions or transcripts and keyboard-operable playback for audio/video; provide a text fallback and never autoplay media.
 - Keep content local-first, ungraded beyond individual practice feedback, and separate from any provider submission.
-- Define an optional, local-first media-authoring workflow that may use VoiceStudio to produce draft narration, dubbed audio or transcripts. Only human-reviewed, licensed, accessible, optimized assets are included in the static site; VoiceStudio itself is not integrated into the learner-facing runtime.
+- Define an optional, local-first media-authoring workflow that may use VoiceStudio or local speech synthesis to produce draft narration, dubbed audio or transcripts. For this personal/family project, the owner may authorize an asset without human or rights review; record this status plainly and do not imply legal clearance. VoiceStudio is not integrated into the learner-facing runtime.
 
 ## Out of scope
 
 - Audiometry, hearing assessment, pronunciation scoring, CEFR placement or proficiency claims.
 - Integrating, hosting, exposing or requiring VoiceStudio's desktop app, local API, MCP server, remote workers or model runtime for learners.
-- Generating lesson curriculum autonomously or publishing unreviewed synthetic media.
 - Requiring audio or video in every lesson; media is optional and must match the stated objective.
-- Recording or uploading a learner's voice for listening exercises.
 - User accounts, cloud media services, external learner analytics, or live human tutoring.
 
 ## Acceptance
@@ -33,4 +31,5 @@ The current practice path asks learners to answer true/false and multiple-choice
 - Lesson answers remain in browser storage unless a separate existing AI-consent action is explicitly offered and accepted.
 - The feature makes no proficiency, hearing, pronunciation or learning-outcome claim.
 - Media generation is an offline authoring step; the learner-facing site makes no runtime request to VoiceStudio or a media-generation provider.
-- Every included media asset has a human-reviewed transcript/caption and recorded source, rights/license and generation provenance sufficient for future maintenance.
+- The included listening sample has a readable transcript and recorded generation provenance; its pronunciation and voice/output rights are explicitly marked as not independently reviewed.
+- Owner-authorized personal/family use may proceed without manual review gates; automated tests, a successful static build and accurate risk metadata remain the release checks.

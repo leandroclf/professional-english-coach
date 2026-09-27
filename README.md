@@ -7,7 +7,7 @@ Total output lines: 71
 
 A text-first practice space for advanced English in backend engineering, architecture reviews, technical leadership and presentations. The goal is to practice formulating and defending ideas before seeing the next prompt.
 
-New sessions begin with a short bilingual learning objective, explanation and English worked example before true/false and multiple-choice practice. An optional audio-cloze activity is implemented but remains hidden until its authored audio passes human pronunciation/transcript and redistribution-rights review. Learner responses continue to stay local unless the learner separately opts into the existing AI text feedback.
+New sessions begin with a short bilingual learning objective, explanation and English worked example before true/false and multiple-choice practice. An optional replayable audio-cloze uses a locally generated English sample with an in-app transcript. The owner authorized personal/family use and accepted public hosting; pronunciation and tool/voice output rights were not independently reviewed. Learner responses continue to stay local unless the learner separately opts into the existing AI text feedback.
 
 ## Run locally
 
@@ -26,7 +26,7 @@ The local Node server keeps provider credentials out of the browser. To enable o
 
 ## Hosted version
 
-The Sites deployment serves the static practice app over HTTPS. Practice sessions, history, review items, interface language and unfinished response drafts remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so the hosted interface reports AI fee…618 tokens truncated…for the practice MVP, progressive exercises, AI feedback, voice practice, and English/PT-BR localization with draft recovery. Some changes remain active pending manual browser or human-rated evaluation. When a change passes its acceptance gates, verify it, sync its requirements into `openspec/specs/`, then archive it. Avoid describing a proposal as shipped functionality.
+The Sites deployment serves the static practice app over HTTPS. Practice sessions, history, review items, interface language and unfinished response drafts remain in the learner's browser storage. Browser speech features depend on browser support. The local Node server's optional AI feedback endpoint is not included in the static hosted build, so the hosted interface reports AI feedback as unavailable. Current requirements in `openspec/specs/` describe the implemented text practice, progressive exercises, pre-practice lessons and audio, AI feedback, voice input, and English/PT-BR localization. Browser-specific checks and human-rated AI-quality evaluation are deferred product-quality work; they are not represented as completed evaluations or learning evidence.
 
 ## Project map
 
@@ -36,7 +36,7 @@ The Sites deployment serves the static practice app over HTTPS. Practice session
 | `src/engine.js` | Pure state transitions and review scheduling |
 | `src/app.js` | Browser UI and actions |
 | `src/i18n.js` | Interface language selection and localized copy |
-| `src/media-assets.js` | Media rights/review gate for static lesson assets |
+| `src/media-assets.js` | Static lesson media metadata and owner authorization |
 | `src/coach.js` | Response schema, input shaping and provider request |
 | `server.js` | Local-only static server and optional feedback endpoint |
 | `scripts/build-static.mjs` | Static asset build for Sites hosting |
@@ -44,8 +44,8 @@ The Sites deployment serves the static practice app over HTTPS. Practice session
 | `docs/research.md` | Research rationale and limits |
 | `docs/roadmap.md` | Prioritized implementation stages and release gates |
 | `docs/acceptance.md` | Completed automated checks and remaining manual acceptance |
-| `content/media-candidates/` | Local-only candidate audio script and review manifest; generated audio is Git-ignored and excluded from the build |
-| `notebooks/lesson_media_review.ipynb` | Colab-compatible technical inspection and human-review worksheet for authored audio |
+| `content/media-candidates/` | Authored audio script and media provenance manifest |
+| `notebooks/lesson_media_review.ipynb` | Optional Colab-compatible inspection notebook for authored audio |
 | `openspec/changes/` | Current and proposed behavior changes |
 
 ## Privacy and limitations

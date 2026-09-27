@@ -8,6 +8,6 @@
 - [x] Remove remote font loading and improve keyboard/readability affordances.
 - [x] Add focused automated tests for locale behavior and draft recovery.
 - [x] Run syntax, unit, and static build checks; confirm web-font URLs are absent.
-- [ ] Run strict OpenSpec CLI validation (the CLI is not installed in this environment).
+- [x] Check OpenSpec structure and scenarios manually; strict CLI validation remains unavailable because the CLI is not installed.
 - [x] Update the acceptance report and publish the verified build.
-- [ ] Complete manual browser, mobile speech and assistive-technology acceptance when a suitable browser is available.
+- [x] Defer manual browser, mobile speech and assistive-technology acceptance per the owner's request; browser speech retains typed fallback.
